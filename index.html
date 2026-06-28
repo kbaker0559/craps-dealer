@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Craps Dealer">
+  <meta name="theme-color" content="#064e3b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Craps Dealer</title>
+  <style>
+    :root { --felt:#064e3b; --felt2:#022c22; --chip:#f8fafc; --gold:#facc15; --ink:#111827; --muted:#d1fae5; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); color:white; background:radial-gradient(circle at top, rgba(255,255,255,.10), transparent 28%), linear-gradient(160deg,var(--felt),var(--felt2)); }
+    .app { max-width:540px; margin:0 auto; }
+    h1 { margin:2px 0 2px; text-align:center; font-size:31px; letter-spacing:.02em; }
+    .subtitle { margin:0 0 14px; text-align:center; color:var(--muted); font-size:14px; }
+    .panel { background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.16); border-radius:24px; padding:15px; box-shadow:0 12px 28px rgba(0,0,0,.28); }
+    label { display:block; margin:13px 0 8px; font-weight:900; font-size:14px; color:#ecfdf5; }
+    .grid { display:grid; gap:9px; }
+    .cats { grid-template-columns:repeat(3,1fr); }
+    .nums { grid-template-columns:repeat(3,1fr); }
+    button { appearance:none; border:0; border-radius:18px; min-height:58px; padding:10px 8px; font-weight:950; font-size:19px; color:var(--ink); background:var(--chip); box-shadow:0 4px 0 rgba(0,0,0,.32); }
+    button:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.32); }
+    button.selected { background:var(--gold); color:#1f2937; }
+    .cat { font-size:17px; }
+    .hidden { display:none; }
+    input { width:100%; border:0; outline:0; border-radius:20px; padding:14px 18px; font-size:40px; font-weight:950; text-align:center; color:#111827; background:#fff; box-shadow:inset 0 0 0 3px rgba(250,204,21,.35); }
+    .result { margin-top:15px; border-radius:24px; padding:14px; text-align:center; background:rgba(0,0,0,.34); border:1px solid rgba(255,255,255,.12); }
+    .context { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; color:#bbf7d0; font-size:14px; margin-bottom:5px; }
+    .context strong { color:white; }
+    .payout-label { margin-top:6px; color:#fde68a; font-size:18px; font-weight:950; letter-spacing:.14em; }
+    .payout { margin:2px 0 4px; font-size:72px; line-height:.98; font-weight:1000; color:var(--gold); text-shadow:0 3px 0 rgba(0,0,0,.35); }
+    .formula { color:#d1fae5; font-size:12px; min-height:17px; }
+    .actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:12px; }
+    .actions button { min-height:48px; font-size:17px; background:#d1d5db; }
+    .actions .primary { background:#facc15; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>🎲 Craps Dealer</h1>
+    <p class="subtitle">Tap bet → tap number → enter amount</p>
+    <section class="panel">
+      <label>Bet</label>
+      <div class="grid cats" id="betTypes">
+        <button class="cat" data-type="passOdds">Odds</button><button class="cat" data-type="place">Place</button><button class="cat" data-type="buy">Buy</button>
+        <button class="cat" data-type="lay">Lay</button><button class="cat" data-type="field">Field</button><button class="cat" data-type="hardway">Hard</button>
+        <button class="cat" data-type="prop">Props</button>
+      </div>
+      <div id="numberSection" class="hidden"><label id="numberLabel">Number</label><div class="grid nums" id="numbers"></div></div>
+      <div id="amountSection" class="hidden"><label for="betAmount">Amount</label><input id="betAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="125"></div>
+      <div class="result">
+        <div class="context"><span>Bet: <strong id="typeOut">—</strong></span><span>Number: <strong id="numOut">—</strong></span></div>
+        <div class="payout-label">PAYOUT</div><div class="payout" id="payOut">$0</div><div class="formula" id="formulaOut">Choose a bet type.</div>
+      </div>
+      <div class="actions"><button id="sameBetBtn" class="primary">Same Bet</button><button id="clearBtn">New Bet</button></div>
+    </section>
+  </main>
+<script>
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js"));
+const amountInput=document.getElementById("betAmount"), betTypeButtons=Array.from(document.querySelectorAll("[data-type]")), numbersDiv=document.getElementById("numbers"), numberSection=document.getElementById("numberSection"), amountSection=document.getElementById("amountSection"), numberLabel=document.getElementById("numberLabel"), typeOut=document.getElementById("typeOut"), numOut=document.getElementById("numOut"), payOut=document.getElementById("payOut"), formulaOut=document.getElementById("formulaOut"), clearBtn=document.getElementById("clearBtn"), sameBetBtn=document.getElementById("sameBetBtn");
+let selectedType=null, selectedNumber=null, lastAmount=localStorage.getItem("lastAmount")||"";
+const labels={passOdds:"Odds",place:"Place",buy:"Buy",lay:"Lay",field:"Field",hardway:"Hard",prop:"Props"};
+const numberSets={passOdds:[4,5,6,8,9,10],place:[4,5,6,8,9,10],buy:[4,5,6,8,9,10],lay:[4,5,6,8,9,10],field:[2,3,4,9,10,11,12],hardway:["Hard 4","Hard 6","Hard 8","Hard 10"],prop:["Any 7","Any Craps","Aces","Ace-Deuce","Yo 11","Boxcars","C&E Craps","C&E Eleven"]};
+function fmt(n){ if(!isFinite(n)) n=0; if(Math.abs(n-Math.round(n))<.005) return n.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}); return n.toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}); }
+function multiplier(type,n){
+ if(type==="passOdds"){ if(n===4||n===10)return[2,"4/10 pays 2:1"]; if(n===5||n===9)return[1.5,"5/9 pays 3:2"]; if(n===6||n===8)return[1.2,"6/8 pays 6:5"]; }
+ if(type==="place"){ if(n===4||n===10)return[1.8,"Place 4/10 pays 9:5"]; if(n===5||n===9)return[1.4,"Place 5/9 pays 7:5"]; if(n===6||n===8)return[7/6,"Place 6/8 pays 7:6"]; }
+ if(type==="buy"){ if(n===4||n===10)return[2,"Buy pays true odds before vig"]; if(n===5||n===9)return[1.5,"Buy pays true odds before vig"]; if(n===6||n===8)return[1.2,"Buy pays true odds before vig"]; }
+ if(type==="lay"){ if(n===4||n===10)return[.5,"Lay 4/10 pays 1:2 before vig"]; if(n===5||n===9)return[2/3,"Lay 5/9 pays 2:3 before vig"]; if(n===6||n===8)return[5/6,"Lay 6/8 pays 5:6 before vig"]; }
+ if(type==="field"){ if(n===2||n===12)return[2,"Field 2/12 pays double"]; return[1,"Field pays even money"]; }
+ if(type==="hardway"){ if(n==="Hard 4"||n==="Hard 10")return[7,"Hard 4/10 pays 7:1"]; if(n==="Hard 6"||n==="Hard 8")return[9,"Hard 6/8 pays 9:1"]; }
+ if(type==="prop"){ if(n==="Any 7")return[4,"Any Seven pays 4:1"]; if(n==="Any Craps")return[7,"Any Craps pays 7:1"]; if(n==="Aces"||n==="Boxcars")return[30,"Aces/Boxcars pays 30:1"]; if(n==="Ace-Deuce"||n==="Yo 11")return[15,"Ace-Deuce/Yo pays 15:1"]; if(n==="C&E Craps")return[3,"C&E craps result: net 3x total wager"]; if(n==="C&E Eleven")return[7,"C&E eleven result: net 7x total wager"]; }
+ return[0,""];
+}
+function renderNumbers(){ numbersDiv.innerHTML=""; selectedNumber=null; amountInput.value=""; amountSection.classList.add("hidden"); if(!selectedType){numberSection.classList.add("hidden");return;} numberSection.classList.remove("hidden"); numberLabel.textContent=selectedType==="field"?"Roll":selectedType==="hardway"?"Hardway":selectedType==="prop"?"Result":"Number"; numberSets[selectedType].forEach(n=>{const b=document.createElement("button"); b.textContent=n; b.onclick=()=>{selectedNumber=isNaN(Number(n))?n:Number(n); Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); amountSection.classList.remove("hidden"); if(!amountInput.value&&lastAmount)amountInput.value=lastAmount; calculate(); setTimeout(()=>amountInput.focus(),50);}; numbersDiv.appendChild(b);});}
+function calculate(){const bet=parseFloat(amountInput.value||"0"); if(amountInput.value){lastAmount=amountInput.value; localStorage.setItem("lastAmount",lastAmount);} typeOut.textContent=selectedType?labels[selectedType]:"—"; numOut.textContent=selectedNumber??"—"; if(!selectedType||selectedNumber===null){payOut.textContent="$0"; formulaOut.textContent=selectedType?"Choose a number/result.":"Choose a bet type."; return;} const [mult,formula]=multiplier(selectedType,selectedNumber); payOut.textContent=fmt(bet*mult); formulaOut.textContent=formula;}
+betTypeButtons.forEach(btn=>btn.onclick=()=>{selectedType=btn.dataset.type; betTypeButtons.forEach(b=>b.classList.remove("selected")); btn.classList.add("selected"); renderNumbers(); calculate();});
+amountInput.oninput=calculate;
+sameBetBtn.onclick=()=>{selectedNumber=null; Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected")); amountSection.classList.add("hidden"); calculate();};
+clearBtn.onclick=()=>{amountInput.value=""; selectedType=null; selectedNumber=null; betTypeButtons.forEach(b=>b.classList.remove("selected")); numberSection.classList.add("hidden"); amountSection.classList.add("hidden"); calculate();};
+calculate();
+</script>
+</body>
+</html>
