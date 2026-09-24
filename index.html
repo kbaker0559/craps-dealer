@@ -38,7 +38,7 @@ function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return
 function voiceSpeak(x){if('speechSynthesis'in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.volume=1;u.rate=1;speechSynthesis.speak(u)}catch(e){}}}
 function parseRoll(raw){let x=voiceWords(raw).replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();x=x.replaceAll('hard for','hard 4').replaceAll('hard fore','hard 4')
     .replaceAll('part eight','hard 8').replaceAll('part 8','hard 8')
-    .replaceAll('four hard','hard 4').replaceAll('4 hard','hard 4')
+    .replaceAll('four hard','hard 4').replaceAll('for hard','hard 4').replaceAll('4 hard','hard 4')
     .replaceAll('six hard','hard 6').replaceAll('6 hard','hard 6')
     .replaceAll('eight hard','hard 8').replaceAll('8 hard','hard 8')
     .replaceAll('ten hard','hard 10').replaceAll('10 hard','hard 10')
