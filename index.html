@@ -36,7 +36,13 @@ const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElement
 let speechUnlocked=false;
 function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}catch(e){}}
 function voiceSpeak(x){if('speechSynthesis'in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.volume=1;u.rate=1;speechSynthesis.speak(u)}catch(e){}}}
-function parseRoll(raw){let x=voiceWords(raw).replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();x=x.replaceAll('hard for','hard 4').replaceAll('hard fore','hard 4').replaceAll('part eight','hard 8').replaceAll('part 8','hard 8').replaceAll('box cars','boxcars');let m=x.match(/\bhard\s*(4|6|8|10)\b/);if(m){let n=+m[1];return{total:n,dice:[n/2,n/2],label:'Hard '+n+' · '+n/2+' + '+n/2}}if(/snake eyes|aces/.test(x))return{total:2,dice:[1,1],label:'Snake Eyes · 1 + 1'};if(/ace[ -]?deuce/.test(x))return{total:3,dice:[1,2],label:'Ace-Deuce · 1 + 2'};if(/boxcars|midnight/.test(x))return{total:12,dice:[6,6],label:'Boxcars · 6 + 6'};if(/\byo(?: 11)?\b/.test(x))return{total:11,dice:null,label:'Yo 11'};m=x.match(/\b(2|3|4|5|6|7|8|9|10|11|12)\b/);return m?{total:+m[1],dice:null,label:'Total '+m[1]}:null}
+function parseRoll(raw){let x=voiceWords(raw).replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();x=x.replaceAll('hard for','hard 4').replaceAll('hard fore','hard 4')
+    .replaceAll('part eight','hard 8').replaceAll('part 8','hard 8')
+    .replaceAll('four hard','hard 4').replaceAll('4 hard','hard 4')
+    .replaceAll('six hard','hard 6').replaceAll('6 hard','hard 6')
+    .replaceAll('eight hard','hard 8').replaceAll('8 hard','hard 8')
+    .replaceAll('ten hard','hard 10').replaceAll('10 hard','hard 10')
+    .replaceAll('box cars','boxcars');let m=x.match(/\bhard\s*(4|6|8|10)\b/);if(m){let n=+m[1];return{total:n,dice:[n/2,n/2],label:'Hard '+n+' · '+n/2+' + '+n/2}}if(/snake eyes|aces/.test(x))return{total:2,dice:[1,1],label:'Snake Eyes · 1 + 1'};if(/ace[ -]?deuce/.test(x))return{total:3,dice:[1,2],label:'Ace-Deuce · 1 + 2'};if(/boxcars|midnight/.test(x))return{total:12,dice:[6,6],label:'Boxcars · 6 + 6'};if(/\byo(?: 11)?\b/.test(x))return{total:11,dice:null,label:'Yo 11'};m=x.match(/\b(2|3|4|5|6|7|8|9|10|11|12)\b/);return m?{total:+m[1],dice:null,label:'Total '+m[1]}:null}
 function voiceAmount(raw){let n=voiceWords(raw).replace(/[$,]/g,' ').match(/\b\d+(?:\.\d+)?\b/g);return n&&n.length===1?+n[0]:null}
 const betDefs={
  odds:{title:'ODDS',calc:a=>multiplier('passOdds',currentRoll)[0]*a},
