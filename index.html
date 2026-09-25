@@ -279,8 +279,8 @@ function pointMessage(state,r){if(state.event==='established')return 'Point is '
 function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
 let comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
-// Show Odds when the table point is made OR when an established Come bet with odds wins.
-if(kinds.includes('odds') && !(state.event==='pointMade' && state.oldPoint===r.total) && comeEvent!=='establishedWinOdds')kinds=kinds.filter(k=>k!=='odds');
+// Show Odds only when active Pass Odds win on a made point OR when an established Come bet with odds wins.
+if(kinds.includes('odds') && !(state.event==='pointMade' && state.hadPassOdds) && comeEvent!=='establishedWinOdds')kinds=kinds.filter(k=>k!=='odds');
 renderVoiceCards(kinds);
 let instruction=dealerInstructionFor(state,r);dealerCall.textContent=instruction.call;dealerAction.textContent=instruction.action;
 let msg=pointMessage(state,r);
