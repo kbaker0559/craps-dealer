@@ -7,157 +7,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Craps Dealer">
   <meta name="theme-color" content="#064e3b">
-  <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Craps Dealer</title>
+  <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><title>Craps Dealer</title>
   <style>
-    :root{--felt:#064e3b;--felt2:#022c22;--chip:#f8fafc;--gold:#facc15;--ink:#111827;--muted:#d1fae5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}*{box-sizing:border-box}
-body{margin:0;min-height:100vh;padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));color:white;background:radial-gradient(circle at top,rgba(255,255,255,.10),transparent 28%),linear-gradient(160deg,var(--felt),var(--felt2))}
-.app{max-width:540px;margin:0 auto}
-h1{margin:2px 0;text-align:center;font-size:31px}
-.subtitle{margin:0 0 14px;text-align:center;color:var(--muted);font-size:14px}
-.panel{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:15px;box-shadow:0 12px 28px rgba(0,0,0,.28)}
-label{display:block;margin:13px 0 8px;font-weight:900;font-size:14px;color:#ecfdf5}
-.grid{display:grid;gap:9px}
-.cats,.nums{grid-template-columns:repeat(3,1fr)}
-button{appearance:none;border:0;border-radius:18px;min-height:58px;padding:10px 8px;font-weight:950;font-size:19px;color:var(--ink);background:var(--chip);box-shadow:0 4px 0 rgba(0,0,0,.32)}
-button:active{transform:translateY(2px)}
-button.selected{background:var(--gold)}
-.cat{font-size:17px}
-.hidden{display:none}
-input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-size:40px;font-weight:950;text-align:center;color:#111827;background:#fff;box-shadow:inset 0 0 0 3px rgba(250,204,21,.35)}
-.result{margin-top:15px;border-radius:24px;padding:14px;text-align:center;background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.12)}
-.context{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;color:#bbf7d0;font-size:14px;margin-bottom:5px}
-.context strong{color:white}
-.payout-label{margin-top:6px;color:#fde68a;font-size:18px;font-weight:950;letter-spacing:.14em}
-.payout{margin:2px 0 4px;font-size:72px;line-height:.98;font-weight:1000;color:var(--gold);text-shadow:0 3px 0 rgba(0,0,0,.35)}
-.formula{color:#d1fae5;font-size:12px;min-height:17px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.actions button{min-height:48px;font-size:17px;background:#d1d5db}
-.actions .primary{background:#facc15}
-  .voice-panel{margin:0 0 14px;padding:14px;border-radius:20px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}
-.roll-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center}
-.roll-label{font-size:18px;font-weight:950;letter-spacing:.12em;color:#fde68a}
-.roll-display{font-size:68px;line-height:1;font-weight:1000;color:#facc15}
-.dice-detail,.voice-status,.voice-heard{font-size:14px;color:#d1fae5;margin-top:6px}
-.mic-btn{min-height:76px;font-size:34px;background:#facc15}
-.mic-btn.small{min-height:58px;width:100%;font-size:26px}
-.mic-btn.listening{background:#fecaca}
-.pay-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.pay-cards .pay-card:last-child:nth-child(odd){grid-column:1/-1}
-.pay-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:10px;text-align:center}
-.pay-title{font-weight:950;font-size:18px;color:#fde68a}
-.bet-line{margin-top:9px;font-size:15px}
-.pay-line{margin-top:5px;font-size:15px}
-.pay-line strong{display:block;font-size:34px;color:#facc15;margin-top:2px}
-.bet-line strong{font-size:21px}
-.manual-divider{margin:18px 0 2px;border-top:1px solid rgba(255,255,255,.18);padding-top:10px;text-align:center;color:#d1fae5;font-size:12px;letter-spacing:.1em}
-.dealer-instruction{margin:0 0 12px;padding:12px;border:2px solid #facc15;border-radius:16px;background:rgba(250,204,21,.10);text-align:center}
-.dealer-call{font-size:23px;font-weight:1000;color:#fff}
-.dealer-action{margin-top:3px;font-size:19px;font-weight:1000;color:#facc15;letter-spacing:.03em}
-.point-state{margin:0 0 12px;padding:10px 12px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(0,0,0,.16);text-align:center}
-.point-label{font-size:12px;letter-spacing:.12em;color:#d1fae5;font-weight:800}
-.point-value{font-size:30px;font-weight:950;color:#facc15;line-height:1.1}
-.point-phase{font-size:13px;color:#e5e7eb;margin-top:3px}
+    :root{--felt:#064e3b;--felt2:#022c22;--chip:#f8fafc;--gold:#facc15;--ink:#111827;--muted:#d1fae5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));color:white;background:radial-gradient(circle at top,rgba(255,255,255,.10),transparent 28%),linear-gradient(160deg,var(--felt),var(--felt2))}.app{max-width:540px;margin:0 auto}h1{margin:2px 0;text-align:center;font-size:31px}.subtitle{margin:0 0 14px;text-align:center;color:var(--muted);font-size:14px}.panel{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:15px;box-shadow:0 12px 28px rgba(0,0,0,.28)}label{display:block;margin:13px 0 8px;font-weight:900;font-size:14px;color:#ecfdf5}.grid{display:grid;gap:9px}.cats,.nums{grid-template-columns:repeat(3,1fr)}button{appearance:none;border:0;border-radius:18px;min-height:58px;padding:10px 8px;font-weight:950;font-size:19px;color:var(--ink);background:var(--chip);box-shadow:0 4px 0 rgba(0,0,0,.32)}button:active{transform:translateY(2px)}button.selected{background:var(--gold)}.cat{font-size:17px}.hidden{display:none}input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-size:40px;font-weight:950;text-align:center;color:#111827;background:#fff;box-shadow:inset 0 0 0 3px rgba(250,204,21,.35)}.result{margin-top:15px;border-radius:24px;padding:14px;text-align:center;background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.12)}.context{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;color:#bbf7d0;font-size:14px;margin-bottom:5px}.context strong{color:white}.payout-label{margin-top:6px;color:#fde68a;font-size:18px;font-weight:950;letter-spacing:.14em}.payout{margin:2px 0 4px;font-size:72px;line-height:.98;font-weight:1000;color:var(--gold);text-shadow:0 3px 0 rgba(0,0,0,.35)}.formula{color:#d1fae5;font-size:12px;min-height:17px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.actions button{min-height:48px;font-size:17px;background:#d1d5db}.actions .primary{background:#facc15}
+  .voice-panel{margin:0 0 14px;padding:14px;border-radius:20px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}.roll-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center}.roll-label{font-size:18px;font-weight:950;letter-spacing:.12em;color:#fde68a}.roll-display{font-size:68px;line-height:1;font-weight:1000;color:#facc15}.dice-detail,.voice-status,.voice-heard{font-size:14px;color:#d1fae5;margin-top:6px}.mic-btn{min-height:76px;font-size:34px;background:#facc15}.mic-btn.small{min-height:58px;width:100%;font-size:26px}.mic-btn.listening{background:#fecaca}.pay-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.pay-cards .pay-card:last-child:nth-child(odd){grid-column:1/-1}.pay-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:10px;text-align:center}.pay-title{font-weight:950;font-size:18px;color:#fde68a}.bet-line{margin-top:9px;font-size:15px}.pay-line{margin-top:5px;font-size:15px}.pay-line strong{display:block;font-size:34px;color:#facc15;margin-top:2px}.bet-line strong{font-size:21px}.manual-divider{margin:18px 0 2px;border-top:1px solid rgba(255,255,255,.18);padding-top:10px;text-align:center;color:#d1fae5;font-size:12px;letter-spacing:.1em}
+.dealer-instruction{margin:0 0 12px;padding:12px;border:2px solid #facc15;border-radius:16px;background:rgba(250,204,21,.10);text-align:center}.dealer-call{font-size:23px;font-weight:1000;color:#fff}.dealer-action{margin-top:3px;font-size:19px;font-weight:1000;color:#facc15;letter-spacing:.03em}.point-state{margin:0 0 12px;padding:10px 12px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(0,0,0,.16);text-align:center}.point-label{font-size:12px;letter-spacing:.12em;color:#d1fae5;font-weight:800}.point-value{font-size:30px;font-weight:950;color:#facc15;line-height:1.1}.point-phase{font-size:13px;color:#e5e7eb;margin-top:3px}
 .come-track{margin-top:12px;padding:12px;border:1px solid #4b5563;border-radius:12px;background:#111827;text-align:center}
 .come-state{font-size:18px;font-weight:900;color:#facc15;margin-bottom:8px}
 .come-btn{width:100%;padding:12px;border:0;border-radius:10px;font-size:17px;font-weight:900;background:#facc15;color:#111827}
-.come-btn:disabled{opacity:.45}
-.come-odds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.come-odds button{padding:9px 12px;border-radius:10px;font-weight:800}
-.place-track{margin-top:10px;padding:10px;border:1px solid #ffffff33;border-radius:12px}
-.place-title{font-weight:900;margin-bottom:7px}
-.place-controls{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
-.place-controls button{padding:8px 11px;border-radius:10px;font-weight:800}
-.place-on{outline:2px solid #fff}
+.come-btn:disabled{opacity:.45}.come-odds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}.come-odds button{padding:9px 12px;border-radius:10px;font-weight:800}.place-track{margin-top:10px;padding:10px;border:1px solid #ffffff33;border-radius:12px}.place-title{font-weight:900;margin-bottom:7px}.place-controls{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}.place-controls button{padding:8px 11px;border-radius:10px;font-weight:800}.place-on{outline:2px solid #fff}
 .repeat-btn{width:100%;min-height:48px;margin-top:10px;border-radius:12px;font-size:17px;font-weight:900;background:#d1d5db;color:#111827}
 .repeat-btn:disabled{opacity:.45}
 </style>
-</head>
-<body>
-<main class="app">
-<h1>🎲 Craps Dealer</h1>
-<p class="subtitle">Tap bet → tap number → enter amount</p>
-<section class="panel">
-<div class="voice-panel">
-<div id="dealerInstruction" class="dealer-instruction">
-<div id="dealerCall" class="dealer-call">COME-OUT ROLL</div>
-<div id="dealerAction" class="dealer-action">POINT OFF</div>
-</div>
-<div class="point-state">
-<div class="point-label">POINT</div>
-<div id="pointDisplay" class="point-value" aria-label="POINT OFF">OFF</div>
-<div id="pointPhase" class="point-phase">COME-OUT</div>
-<button id="passOddsBtn" class="come-btn" disabled>ADD PASS ODDS</button>
-</div>
-<div class="come-track">
-<div id="comeState" class="come-state">COME: —</div>
-<button id="comeBetBtn" class="come-btn" disabled>COME BET</button>
-</div>
-<div id="comeOddsControls" class="come-odds">
-</div>
-<div class="place-track">
-<div id="placeState" class="place-title">PLACE BETS: —</div>
-<div id="placeControls" class="place-controls">
-</div>
-</div>
-<div class="roll-row">
-<div>
-<div class="roll-label">ROLL IS</div>
-<div id="rollDisplay" class="roll-display">—</div>
-<div id="diceDetail" class="dice-detail">Tap the microphone and call the roll.</div>
-</div>
-<button id="rollMic" class="mic-btn">🎤</button>
-</div>
-<button id="repeatCallBtn" class="repeat-btn" disabled>🔊 REPEAT CALL</button>
-<div id="rollHeard" class="voice-heard">
-</div>
-<div id="payCards" class="pay-cards hidden">
-</div>
-<div id="dealerStatus" class="voice-status">Tap ROLL IS and say “Eight” or “8 hard.”</div>
-</div>
-<div class="manual-divider">MANUAL CALCULATOR</div>
-<label>Bet</label>
-<div class="grid cats" id="betTypes">
-<button class="cat" data-type="passOdds">Odds</button>
-<button class="cat" data-type="place">Place</button>
-<button class="cat" data-type="buy">Buy</button>
-<button class="cat" data-type="lay">Lay</button>
-<button class="cat" data-type="field">Field</button>
-<button class="cat" data-type="hardway">Hard</button>
-<button class="cat" data-type="prop">Props</button>
-</div>
-<div id="numberSection" class="hidden">
-<label id="numberLabel">Number</label>
-<div class="grid nums" id="numbers">
-</div>
-</div>
-<div id="subSection" class="hidden">
-<label id="subLabel">Roll</label>
-<div class="grid nums" id="subNumbers">
-</div>
-</div>
-<div id="amountSection" class="hidden">
-<label for="betAmount">Amount</label>
-<input id="betAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="125">
-</div>
-<div class="result">
-<div class="context">
-<span>Bet: <strong id="typeOut">—</strong>
-</span>
-<span>Number: <strong id="numOut">—</strong>
-</span>
-</div>
-<div class="payout-label">PAYOUT</div>
-<div class="payout" id="payOut">$0</div>
-<div class="formula" id="formulaOut">Choose a bet type.</div>
-</div>
-<div class="actions">
-<button id="sameBetBtn" class="primary">Same Bet</button>
-<button id="clearBtn">New Bet</button>
-</div>
-</section>
-</main>
+</head><body><main class="app"><h1>🎲 Craps Dealer</h1><p class="subtitle">Tap bet → tap number → enter amount</p><section class="panel"><div class="voice-panel"><div id="dealerInstruction" class="dealer-instruction"><div id="dealerCall" class="dealer-call">COME-OUT ROLL</div><div id="dealerAction" class="dealer-action">POINT OFF</div></div><div class="point-state"><div class="point-label">POINT</div><div id="pointDisplay" class="point-value" aria-label="POINT OFF">OFF</div><div id="pointPhase" class="point-phase">COME-OUT</div></div><div class="come-track"><div id="comeState" class="come-state">COME: —</div><button id="comeBetBtn" class="come-btn" disabled>COME BET</button></div><div id="comeOddsControls" class="come-odds"></div><div class="place-track"><div id="placeState" class="place-title">PLACE BETS: —</div><div id="placeControls" class="place-controls"></div></div><div class="roll-row"><div><div class="roll-label">ROLL IS</div><div id="rollDisplay" class="roll-display">—</div><div id="diceDetail" class="dice-detail">Tap the microphone and call the roll.</div></div><button id="rollMic" class="mic-btn">🎤</button></div><button id="repeatCallBtn" class="repeat-btn" disabled>🔊 REPEAT CALL</button><div id="rollHeard" class="voice-heard"></div><div id="payCards" class="pay-cards hidden"></div><div id="dealerStatus" class="voice-status">Tap ROLL IS and say “Eight” or “8 hard.”</div></div><div class="manual-divider">MANUAL CALCULATOR</div><label>Bet</label><div class="grid cats" id="betTypes"><button class="cat" data-type="passOdds">Odds</button><button class="cat" data-type="place">Place</button><button class="cat" data-type="buy">Buy</button><button class="cat" data-type="lay">Lay</button><button class="cat" data-type="field">Field</button><button class="cat" data-type="hardway">Hard</button><button class="cat" data-type="prop">Props</button></div><div id="numberSection" class="hidden"><label id="numberLabel">Number</label><div class="grid nums" id="numbers"></div></div><div id="subSection" class="hidden"><label id="subLabel">Roll</label><div class="grid nums" id="subNumbers"></div></div><div id="amountSection" class="hidden"><label for="betAmount">Amount</label><input id="betAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="125"></div><div class="result"><div class="context"><span>Bet: <strong id="typeOut">—</strong></span><span>Number: <strong id="numOut">—</strong></span></div><div class="payout-label">PAYOUT</div><div class="payout" id="payOut">$0</div><div class="formula" id="formulaOut">Choose a bet type.</div></div><div class="actions"><button id="sameBetBtn" class="primary">Same Bet</button><button id="clearBtn">New Bet</button></div></section></main>
 <script>
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js"));
 const amountInput=document.getElementById("betAmount"),betTypeButtons=Array.from(document.querySelectorAll("[data-type]")),numbersDiv=document.getElementById("numbers"),numberSection=document.getElementById("numberSection"),subSection=document.getElementById("subSection"),subNumbers=document.getElementById("subNumbers"),amountSection=document.getElementById("amountSection"),numberLabel=document.getElementById("numberLabel"),typeOut=document.getElementById("typeOut"),numOut=document.getElementById("numOut"),payOut=document.getElementById("payOut"),formulaOut=document.getElementById("formulaOut"),clearBtn=document.getElementById("clearBtn"),sameBetBtn=document.getElementById("sameBetBtn");
@@ -165,68 +27,28 @@ let selectedType=null,selectedNumber=null,hornHighNumber=null,hornHighRoll=null;
 localStorage.removeItem("lastAmount");
 const labels={passOdds:"Odds",place:"Place",buy:"Buy",lay:"Lay",field:"Field",hardway:"Hard",prop:"Props"};
 const numberSets={passOdds:[4,5,6,8,9,10],place:[4,5,6,8,9,10],buy:[4,5,6,8,9,10],lay:[4,5,6,8,9,10],field:[2,3,4,9,10,11,12],hardway:["Hard 4","Hard 6","Hard 8","Hard 10"],prop:["Any 7","Any Craps","Aces","Ace-Deuce","Yo 11","Boxcars","C&E Craps","C&E Eleven","Horn 2","Horn 3","Horn 11","Horn 12","Horn High"]};
-
 function fmt(n){if(!isFinite(n))n=0;if(Math.abs(n-Math.round(n))<.005)return n.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});return n.toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2})}
-
-function multiplier(type,n){if(type==="passOdds"){if(n===4||n===10)return[2,"4/10 pays 2:1"];if(n===5||n===9)return[1.5,"5/9 pays 3:2"];if(n===6||n===8)return[1.2,"6/8 pays 6:5"]}
-if(type==="place"){if(n===4||n===10)return[1.8,"Place 4/10 pays 9:5"];if(n===5||n===9)return[1.4,"Place 5/9 pays 7:5"];if(n===6||n===8)return[7/6,"Place 6/8 pays 7:6"]}
-if(type==="buy"){if(n===4||n===10)return[2,"Buy pays true odds before vig"];if(n===5||n===9)return[1.5,"Buy pays true odds before vig"];if(n===6||n===8)return[1.2,"Buy pays true odds before vig"]}
-if(type==="lay"){if(n===4||n===10)return[.5,"Lay 4/10 pays 1:2 before vig"];if(n===5||n===9)return[2/3,"Lay 5/9 pays 2:3 before vig"];if(n===6||n===8)return[5/6,"Lay 6/8 pays 5:6 before vig"]}
-if(type==="field"){if(n===2||n===12)return[2,"Field 2/12 pays double"];return[1,"Field pays even money"]}
-if(type==="hardway"){if(n==="Hard 4"||n==="Hard 10")return[7,"Hard 4/10 pays 7:1"];if(n==="Hard 6"||n==="Hard 8")return[9,"Hard 6/8 pays 9:1"]}
-if(type==="prop"){if(n==="Any 7")return[4,"Any Seven pays 4:1"];if(n==="Any Craps")return[7,"Any Craps pays 7:1"];if(n==="Aces"||n==="Boxcars")return[30,"Aces/Boxcars pays 30:1"];if(n==="Ace-Deuce"||n==="Yo 11")return[15,"Ace-Deuce/Yo pays 15:1"];if(n==="C&E Craps")return[3,"C&E craps result: net 3x total wager"];if(n==="C&E Eleven")return[7,"C&E eleven result: net 7x total wager"];if(n==="Horn 2"||n==="Horn 12")return[6.75,"Horn 2/12: net winnings after three losing portions"];if(n==="Horn 3"||n==="Horn 11")return[3,"Horn 3/11: net winnings after three losing portions"]}
-return[0,""]}
-
+function multiplier(type,n){if(type==="passOdds"){if(n===4||n===10)return[2,"4/10 pays 2:1"];if(n===5||n===9)return[1.5,"5/9 pays 3:2"];if(n===6||n===8)return[1.2,"6/8 pays 6:5"]}if(type==="place"){if(n===4||n===10)return[1.8,"Place 4/10 pays 9:5"];if(n===5||n===9)return[1.4,"Place 5/9 pays 7:5"];if(n===6||n===8)return[7/6,"Place 6/8 pays 7:6"]}if(type==="buy"){if(n===4||n===10)return[2,"Buy pays true odds before vig"];if(n===5||n===9)return[1.5,"Buy pays true odds before vig"];if(n===6||n===8)return[1.2,"Buy pays true odds before vig"]}if(type==="lay"){if(n===4||n===10)return[.5,"Lay 4/10 pays 1:2 before vig"];if(n===5||n===9)return[2/3,"Lay 5/9 pays 2:3 before vig"];if(n===6||n===8)return[5/6,"Lay 6/8 pays 5:6 before vig"]}if(type==="field"){if(n===2||n===12)return[2,"Field 2/12 pays double"];return[1,"Field pays even money"]}if(type==="hardway"){if(n==="Hard 4"||n==="Hard 10")return[7,"Hard 4/10 pays 7:1"];if(n==="Hard 6"||n==="Hard 8")return[9,"Hard 6/8 pays 9:1"]}if(type==="prop"){if(n==="Any 7")return[4,"Any Seven pays 4:1"];if(n==="Any Craps")return[7,"Any Craps pays 7:1"];if(n==="Aces"||n==="Boxcars")return[30,"Aces/Boxcars pays 30:1"];if(n==="Ace-Deuce"||n==="Yo 11")return[15,"Ace-Deuce/Yo pays 15:1"];if(n==="C&E Craps")return[3,"C&E craps result: net 3x total wager"];if(n==="C&E Eleven")return[7,"C&E eleven result: net 7x total wager"];if(n==="Horn 2"||n==="Horn 12")return[6.75,"Horn 2/12: net winnings after three losing portions"];if(n==="Horn 3"||n==="Horn 11")return[3,"Horn 3/11: net winnings after three losing portions"]}return[0,""]}
 function resetAmount(){amountInput.value="";amountSection.classList.add("hidden")}
-
 function showAmount(){amountInput.value="";amountSection.classList.remove("hidden");calculate();setTimeout(()=>amountInput.focus(),50)}
-
 function showHornHighChoices(){numbersDiv.innerHTML="";numberLabel.textContent="High Number";[2,3,11,12].forEach(n=>{const b=document.createElement("button");b.textContent="High "+n;b.onclick=()=>{hornHighNumber=n;Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));b.classList.add("selected");showHornHighRolls();calculate()};numbersDiv.appendChild(b)})}
-
 function showHornHighRolls(){subNumbers.innerHTML="";hornHighRoll=null;resetAmount();subSection.classList.remove("hidden");[2,3,11,12].forEach(n=>{const b=document.createElement("button");b.textContent="Roll "+n;b.onclick=()=>{hornHighRoll=n;Array.from(subNumbers.children).forEach(x=>x.classList.remove("selected"));b.classList.add("selected");showAmount()};subNumbers.appendChild(b)})}
-
-function renderNumbers(){numbersDiv.innerHTML="";subNumbers.innerHTML="";selectedNumber=null;hornHighNumber=null;hornHighRoll=null;subSection.classList.add("hidden");resetAmount();if(!selectedType){numberSection.classList.add("hidden");return}
-numberSection.classList.remove("hidden");numberLabel.textContent=selectedType==="field"?"Roll":selectedType==="hardway"?"Hardway":selectedType==="prop"?"Result":"Number";numberSets[selectedType].forEach(n=>{const b=document.createElement("button");b.textContent=n;b.onclick=()=>{selectedNumber=isNaN(Number(n))?n:Number(n);Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));b.classList.add("selected");if(selectedType==="prop"&&n==="Horn High"){resetAmount();showHornHighChoices();return}
-subSection.classList.add("hidden");showAmount()};numbersDiv.appendChild(b)})}
-
+function renderNumbers(){numbersDiv.innerHTML="";subNumbers.innerHTML="";selectedNumber=null;hornHighNumber=null;hornHighRoll=null;subSection.classList.add("hidden");resetAmount();if(!selectedType){numberSection.classList.add("hidden");return}numberSection.classList.remove("hidden");numberLabel.textContent=selectedType==="field"?"Roll":selectedType==="hardway"?"Hardway":selectedType==="prop"?"Result":"Number";numberSets[selectedType].forEach(n=>{const b=document.createElement("button");b.textContent=n;b.onclick=()=>{selectedNumber=isNaN(Number(n))?n:Number(n);Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));b.classList.add("selected");if(selectedType==="prop"&&n==="Horn High"){resetAmount();showHornHighChoices();return}subSection.classList.add("hidden");showAmount()};numbersDiv.appendChild(b)})}
 function hornHighPayout(bet,high,roll){const unit=bet/5,winningUnits=roll===high?2:1,losingUnits=5-winningUnits,odds=(roll===2||roll===12)?30:15;return winningUnits*unit*odds-losingUnits*unit}
-
-function calculate(){const bet=parseFloat(amountInput.value||"0");typeOut.textContent=selectedType?labels[selectedType]:"—";if(selectedType==="prop"&&selectedNumber==="Horn High"){numOut.textContent=hornHighNumber?(hornHighRoll?`High ${hornHighNumber} / Roll ${hornHighRoll}`:`High ${hornHighNumber}`):"Horn High";if(!hornHighNumber){payOut.textContent="$0";formulaOut.textContent="Choose the Horn High number.";return}
-if(!hornHighRoll){payOut.textContent="$0";formulaOut.textContent="Choose the roll.";return}
-payOut.textContent=fmt(hornHighPayout(bet,hornHighNumber,hornHighRoll));formulaOut.textContent=`Horn High ${hornHighNumber}: ${hornHighRoll===hornHighNumber?"2":"1"} unit${hornHighRoll===hornHighNumber?"s":""} wins; losing portions deducted`;return}
-numOut.textContent=selectedNumber??"—";if(!selectedType||selectedNumber===null){payOut.textContent="$0";formulaOut.textContent=selectedType?"Choose a number/result.":"Choose a bet type.";return}
-const[mult,formula]=multiplier(selectedType,selectedNumber);payOut.textContent=fmt(bet*mult);formulaOut.textContent=formula}
-
-function voiceWords(text){const o={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},t={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
-let a=text.toLowerCase().replace(/-/g," ").split(/\s+/),r=[],i=0;while(i<a.length){let x=a[i],v=null,u=0;if(/^\$?\d+(?:\.\d+)?$/.test(x)){r.push(x.replace('$',''));i++;continue}
-if(o[x]!==undefined){v=o[x];u=1}
-else if(t[x]!==undefined){v=t[x];u=1;if(o[a[i+1]]!==undefined&&o[a[i+1]]<10){v+=o[a[i+1]];u=2}}
-if(v!==null){r.push(String(v));i+=u}
-else{r.push(x);i++}}
-return r.join(" ")}
+function calculate(){const bet=parseFloat(amountInput.value||"0");typeOut.textContent=selectedType?labels[selectedType]:"—";if(selectedType==="prop"&&selectedNumber==="Horn High"){numOut.textContent=hornHighNumber?(hornHighRoll?`High ${hornHighNumber} / Roll ${hornHighRoll}`:`High ${hornHighNumber}`):"Horn High";if(!hornHighNumber){payOut.textContent="$0";formulaOut.textContent="Choose the Horn High number.";return}if(!hornHighRoll){payOut.textContent="$0";formulaOut.textContent="Choose the roll.";return}payOut.textContent=fmt(hornHighPayout(bet,hornHighNumber,hornHighRoll));formulaOut.textContent=`Horn High ${hornHighNumber}: ${hornHighRoll===hornHighNumber?"2":"1"} unit${hornHighRoll===hornHighNumber?"s":""} wins; losing portions deducted`;return}numOut.textContent=selectedNumber??"—";if(!selectedType||selectedNumber===null){payOut.textContent="$0";formulaOut.textContent=selectedType?"Choose a number/result.":"Choose a bet type.";return}const[mult,formula]=multiplier(selectedType,selectedNumber);payOut.textContent=fmt(bet*mult);formulaOut.textContent=formula}
+function voiceWords(text){const o={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},t={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};let a=text.toLowerCase().replace(/-/g," ").split(/\s+/),r=[],i=0;while(i<a.length){let x=a[i],v=null,u=0;if(/^\$?\d+(?:\.\d+)?$/.test(x)){r.push(x.replace('$',''));i++;continue}if(o[x]!==undefined){v=o[x];u=1}else if(t[x]!==undefined){v=t[x];u=1;if(o[a[i+1]]!==undefined&&o[a[i+1]]<10){v+=o[a[i+1]];u=2}}if(v!==null){r.push(String(v));i+=u}else{r.push(x);i++}}return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn');
-let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='';
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),repeatCallBtn=document.getElementById('repeatCallBtn');let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],lastDealerCall='';
 let speechUnlocked=false;
-
-function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}
-catch(e){}}
-
-function voiceSpeak(x,remember=false){if(remember){lastDealerCall=x;repeatCallBtn.disabled=!lastDealerCall}
-if('speechSynthesis'in window){try{speechSynthesis.cancel();
-const u=new SpeechSynthesisUtterance(x);u.volume=1;u.rate=1;speechSynthesis.speak(u)}
-catch(e){}}}
-
+function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}catch(e){}}
+function voiceSpeak(x,remember=false){if(remember){lastDealerCall=x;repeatCallBtn.disabled=!lastDealerCall}if('speechSynthesis'in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.volume=1;u.rate=1;speechSynthesis.speak(u)}catch(e){}}}
 function parseRoll(raw){let x=voiceWords(raw).replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();x=x.replaceAll('hard for','hard 4').replaceAll('hard fore','hard 4')
     .replaceAll('part eight','hard 8').replaceAll('part 8','hard 8')
     .replaceAll('four hard','hard 4').replaceAll('for hard','hard 4').replaceAll('4 hard','hard 4')
     .replaceAll('six hard','hard 6').replaceAll('6 hard','hard 6')
     .replaceAll('eight hard','hard 8').replaceAll('8 hard','hard 8')
     .replaceAll('ten hard','hard 10').replaceAll('10 hard','hard 10')
-    .replaceAll('box cars','boxcars');
-let m=x.match(/\bhard\s*(4|6|8|10)\b/);if(m){let n=+m[1];return{total:n,dice:[n/2,n/2],label:'Hard '+n+' · '+n/2+' + '+n/2}}
-if(/snake eyes|aces/.test(x))return{total:2,dice:[1,1],label:'Snake Eyes · 1 + 1'};if(/ace[ -]?deuce/.test(x))return{total:3,dice:[1,2],label:'Ace-Deuce · 1 + 2'};if(/boxcars|midnight/.test(x))return{total:12,dice:[6,6],label:'Boxcars · 6 + 6'};if(/\byo(?: 11)?\b/.test(x))return{total:11,dice:null,label:'Yo 11'};m=x.match(/\b(2|3|4|5|6|7|8|9|10|11|12)\b/);return m?{total:+m[1],dice:null,label:'Total '+m[1]}:null}
-
+    .replaceAll('box cars','boxcars');let m=x.match(/\bhard\s*(4|6|8|10)\b/);if(m){let n=+m[1];return{total:n,dice:[n/2,n/2],label:'Hard '+n+' · '+n/2+' + '+n/2}}if(/snake eyes|aces/.test(x))return{total:2,dice:[1,1],label:'Snake Eyes · 1 + 1'};if(/ace[ -]?deuce/.test(x))return{total:3,dice:[1,2],label:'Ace-Deuce · 1 + 2'};if(/boxcars|midnight/.test(x))return{total:12,dice:[6,6],label:'Boxcars · 6 + 6'};if(/\byo(?: 11)?\b/.test(x))return{total:11,dice:null,label:'Yo 11'};m=x.match(/\b(2|3|4|5|6|7|8|9|10|11|12)\b/);return m?{total:+m[1],dice:null,label:'Total '+m[1]}:null}
 function voiceAmount(raw){let n=voiceWords(raw).replace(/[$,]/g,' ').match(/\b\d+(?:\.\d+)?\b/g);return n&&n.length===1?+n[0]:null}
 const betDefs={
  odds:{title:'ODDS',calc:a=>multiplier('passOdds',currentRoll)[0]*a},
@@ -243,72 +65,26 @@ const betDefs={
  ce:{title:'C&E',calc:a=>multiplier('prop',currentRoll===11?'C&E Eleven':'C&E Craps')[0]*a},
  horn:{title:'HORN',calc:a=>multiplier('prop','Horn '+currentRoll)[0]*a}
 };
-
 function betsForRoll(r){let a=[];if([4,5,6,8,9,10].includes(r.total))a.push('odds','place','buy');if([2,3,4,9,10,11,12].includes(r.total))a.push('field');if(r.dice&&r.dice[0]===r.dice[1]&&[4,6,8,10].includes(r.total))a.push('hard');if(r.total===7)a.push('any7');if([2,3,12].includes(r.total))a.push('anyCraps');if(r.total===2)a.push('aces');if(r.total===3)a.push('aceDeuce');if(r.total===11)a.push('yo');if(r.total===12)a.push('boxcars');if([2,3,11,12].includes(r.total))a.push('ce','horn');return a}
-
 function cardTitle(kind){let t=betDefs[kind].title;if(['odds','place','buy','hard'].includes(kind))t+=' '+currentRoll;return t}
-
-function renderVoiceCards(kinds){payCards.innerHTML='';payCards.classList.toggle('hidden',!kinds.length);kinds.forEach(kind=>{let c=document.createElement('div');c.className='pay-card';c.dataset.kind=kind;c.innerHTML='<div class="pay-title">'+cardTitle(kind)+'</div>
-<button class="mic-btn small" data-voice-kind="'+kind+'">🎤</button>
-<div class="bet-line">BET <strong data-bet>—</strong>
-</div>
-<div class="pay-line">PAYOUT <strong data-pay>—</strong>
-</div>';payCards.appendChild(c)});payCards.querySelectorAll('[data-voice-kind]').forEach(b=>b.addEventListener('click',()=>voiceListen(b.dataset.voiceKind,b)))}
-
+function renderVoiceCards(kinds){payCards.innerHTML='';payCards.classList.toggle('hidden',!kinds.length);kinds.forEach(kind=>{let c=document.createElement('div');c.className='pay-card';c.dataset.kind=kind;c.innerHTML='<div class="pay-title">'+cardTitle(kind)+'</div><button class="mic-btn small" data-voice-kind="'+kind+'">🎤</button><div class="bet-line">BET <strong data-bet>—</strong></div><div class="pay-line">PAYOUT <strong data-pay>—</strong></div>';payCards.appendChild(c)});payCards.querySelectorAll('[data-voice-kind]').forEach(b=>b.addEventListener('click',()=>voiceListen(b.dataset.voiceKind,b)))}
 function updateComeDisplay(){let parts=[];if(comeWorking)parts.push('WORKING');if(comeNumbers.length)parts.push(comeNumbers.map(n=>n+(comeOddsNumbers.includes(n)?' + ODDS':'')).join(' · '));comeState.textContent='COME: '+(parts.length?parts.join(' · '):'—');comeBetBtn.disabled=point===null||comeWorking;comeBetBtn.textContent=comeWorking?'COME BET WORKING':'COME BET';comeOddsControls.innerHTML='';comeNumbers.forEach(n=>{let b=document.createElement('button'),on=comeOddsNumbers.includes(n);b.textContent=on?'REMOVE ODDS '+n:'ADD ODDS '+n;b.addEventListener('click',()=>{if(on)comeOddsNumbers=comeOddsNumbers.filter(x=>x!==n);else comeOddsNumbers.push(n);updateComeDisplay();dealerStatus.textContent='Come '+n+' odds '+(on?'removed.':'working.');voiceSpeak('Come '+n+' odds '+(on?'removed.':'working.'))});comeOddsControls.appendChild(b)})}
-
 function updatePlaceDisplay(){placeState.textContent='PLACE BETS: '+(placeNumbers.length?placeNumbers.join(' · '):'—')+(point===null&&placeNumbers.length?' (OFF ON COME-OUT)':'');placeControls.innerHTML='';[4,5,6,8,9,10].forEach(n=>{let b=document.createElement('button'),on=placeNumbers.includes(n);b.textContent=(on?'REMOVE PLACE ':'ADD PLACE ')+n;if(on)b.classList.add('place-on');b.addEventListener('click',()=>{if(on)placeNumbers=placeNumbers.filter(x=>x!==n);else placeNumbers.push(n);placeNumbers.sort((a,b)=>a-b);updatePlaceDisplay();dealerStatus.textContent='Place '+n+' '+(on?'removed.':'working.');voiceSpeak('Place '+n+' '+(on?'removed.':'working.'))});placeControls.appendChild(b)})}
-
-function updatePointDisplay(){pointDisplay.textContent=point===null?'OFF':point;pointPhase.textContent=point===null?'COME-OUT':'POINT IS '+point;passOddsBtn.disabled=point===null;passOddsBtn.textContent=passOddsWorking?'REMOVE PASS ODDS':'ADD PASS ODDS';updateComeDisplay();updatePlaceDisplay()}
-
-function applyComeState(r,state){if(state.oldPoint===null)return null;if(state.event==='sevenOut'){let hadWorking=comeWorking,hadEstablished=comeNumbers.length>0,hadOdds=comeOddsNumbers.length>0;comeWorking=false;comeNumbers=[];comeOddsNumbers=[];updateComeDisplay();if(hadWorking&&hadEstablished)return hadOdds?'sevenOutBothOdds':'sevenOutBoth';if(hadWorking)return 'comeBoxWin';if(hadEstablished)return hadOdds?'establishedLostOdds':'establishedLost';return null}
-let establishedIndex=comeNumbers.indexOf(r.total);if(establishedIndex!==-1){let hadOdds=comeOddsNumbers.includes(r.total);comeNumbers.splice(establishedIndex,1);comeOddsNumbers=comeOddsNumbers.filter(x=>x!==r.total);updateComeDisplay();return hadOdds?'establishedWinOdds':'establishedWin'}
-if(!comeWorking)return null;if([4,5,6,8,9,10].includes(r.total)){comeWorking=false;if(!comeNumbers.includes(r.total))comeNumbers.push(r.total);updateComeDisplay();return 'traveled'}
-if(r.total===7||r.total===11){comeWorking=false;updateComeDisplay();return 'comeBoxWin'}
-if([2,3,12].includes(r.total)){comeWorking=false;updateComeDisplay();return 'comeBoxLoss'}
-return null}
-
-function applyPointState(r){let oldPoint=point,event='roll';if(oldPoint===null){if([4,5,6,8,9,10].includes(r.total)){point=r.total;event='established'}
-else if(r.total===7||r.total===11)event='comeoutWin';else if([2,3,12].includes(r.total))event='comeoutCraps'}
-else{if(r.total===oldPoint){point=null;event='pointMade'}
-else if(r.total===7){point=null;event='sevenOut'}}
-updatePointDisplay();return{event,oldPoint}}
-
-function dealerInstructionFor(state,r){if(state.event==='established')return{call:'POINT IS '+r.total,action:'POINT '+r.total};if(state.event==='pointMade')return{call:r.total+' — WINNER!',action:state.hadPassOdds?'PAY PASS LINE + ODDS':'PAY PASS LINE'};if(state.event==='sevenOut')return{call:'SEVEN OUT',action:'TAKE LINE · PAY COME BOX'};if(state.event==='comeoutWin'&&r.total===7)return{call:'SEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutWin'&&r.total===11)return{call:'YO ELEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutCraps')return{call:r.total===12?'CRAPS TWELVE':'CRAPS '+r.total,action:'PASS LINE LOSES'};return{call:'ROLL IS '+r.total,action:'POINT REMAINS '+state.oldPoint}}
-
-function rollCallSpeech(r){if(r.dice&&r.dice[0]===r.dice[1]){if(r.total===2)return 'Roll is snake eyes.';if([4,6,8,10].includes(r.total))return 'Roll is hard '+r.total+'.';if(r.total===12)return 'Roll is boxcars.'}
-if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll is yo eleven.';return 'Roll is '+r.total+'.'}
-
-function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line'+(state.hadPassOdds?' and odds':'')+'. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
-
-function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
-let hadPassOdds=passOddsWorking,state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
-let comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
+function updatePointDisplay(){pointDisplay.textContent=point===null?'OFF':point;pointPhase.textContent=point===null?'COME-OUT':'POINT IS '+point;updateComeDisplay();updatePlaceDisplay()}
+function applyComeState(r,state){if(state.oldPoint===null)return null;if(state.event==='sevenOut'){let hadWorking=comeWorking,hadEstablished=comeNumbers.length>0,hadOdds=comeOddsNumbers.length>0;comeWorking=false;comeNumbers=[];comeOddsNumbers=[];updateComeDisplay();if(hadWorking&&hadEstablished)return hadOdds?'sevenOutBothOdds':'sevenOutBoth';if(hadWorking)return 'comeBoxWin';if(hadEstablished)return hadOdds?'establishedLostOdds':'establishedLost';return null}let establishedIndex=comeNumbers.indexOf(r.total);if(establishedIndex!==-1){let hadOdds=comeOddsNumbers.includes(r.total);comeNumbers.splice(establishedIndex,1);comeOddsNumbers=comeOddsNumbers.filter(x=>x!==r.total);updateComeDisplay();return hadOdds?'establishedWinOdds':'establishedWin'}if(!comeWorking)return null;if([4,5,6,8,9,10].includes(r.total)){comeWorking=false;if(!comeNumbers.includes(r.total))comeNumbers.push(r.total);updateComeDisplay();return 'traveled'}if(r.total===7||r.total===11){comeWorking=false;updateComeDisplay();return 'comeBoxWin'}if([2,3,12].includes(r.total)){comeWorking=false;updateComeDisplay();return 'comeBoxLoss'}return null}
+function applyPointState(r){let oldPoint=point,event='roll';if(oldPoint===null){if([4,5,6,8,9,10].includes(r.total)){point=r.total;event='established'}else if(r.total===7||r.total===11)event='comeoutWin';else if([2,3,12].includes(r.total))event='comeoutCraps'}else{if(r.total===oldPoint){point=null;event='pointMade'}else if(r.total===7){point=null;event='sevenOut'}}updatePointDisplay();return{event,oldPoint}}
+function dealerInstructionFor(state,r){if(state.event==='established')return{call:'POINT IS '+r.total,action:'POINT '+r.total};if(state.event==='pointMade')return{call:r.total+' — WINNER!',action:'PAY PASS LINE + ODDS'};if(state.event==='sevenOut')return{call:'SEVEN OUT',action:'TAKE LINE · PAY COME BOX'};if(state.event==='comeoutWin'&&r.total===7)return{call:'SEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutWin'&&r.total===11)return{call:'YO ELEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutCraps')return{call:r.total===12?'CRAPS TWELVE':'CRAPS '+r.total,action:'PASS LINE LOSES'};return{call:'ROLL IS '+r.total,action:'POINT REMAINS '+state.oldPoint}}
+function rollCallSpeech(r){if(r.dice&&r.dice[0]===r.dice[1]){if(r.total===2)return 'Roll is snake eyes.';if([4,6,8,10].includes(r.total))return 'Roll is hard '+r.total+'.';if(r.total===12)return 'Roll is boxcars.'}if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll is yo eleven.';return 'Roll is '+r.total+'.'}
+function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line and odds. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
+function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';let state=applyPointState(r),comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
 // Show Odds when the table point is made OR when an established Come bet with odds wins.
 if(kinds.includes('odds') && !(state.event==='pointMade' && state.oldPoint===r.total) && comeEvent!=='establishedWinOdds')kinds=kinds.filter(k=>k!=='odds');
-renderVoiceCards(kinds);
-let instruction=dealerInstructionFor(state,r);dealerCall.textContent=instruction.call;dealerAction.textContent=instruction.action;
-let msg=pointMessage(state,r);
-let comeNote=comeEvent==='traveled'?' Come bet moved to '+r.total+'. Add odds if needed.':comeEvent==='establishedWinOdds'?' Come '+r.total+' and odds win.':comeEvent==='establishedWin'?' Come '+r.total+' wins.':comeEvent==='establishedLostOdds'?' Established Come bets and odds lose.':comeEvent==='establishedLost'?' Established Come bets lose.':comeEvent==='sevenOutBothOdds'?' Established Come bets and odds lose.':comeEvent==='sevenOutBoth'?' Established Come bets lose.':comeEvent==='comeBoxWin'?'':comeEvent==='comeBoxLoss'?' Come-box bet loses.':'';
-let placeNote=state.event==='sevenOut'&&placeNumbers.length?' Take the Place bets.':'';
-let comeBoxNote=(comeEvent==='sevenOutBothOdds'||comeEvent==='sevenOutBoth'||comeEvent==='comeBoxWin')?' Pay the Come box.':'';if(state.event==='sevenOut')placeNumbers=[];
-let closing=state.event==='sevenOut'?' Point is off. New come-out roll.':'';
-let fullCall=msg+comeNote+placeNote+comeBoxNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();if(state.event==='pointMade'||state.event==='sevenOut')updatePointDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');voiceSpeak(fullCall,true)}
-
-function setVoiceBet(kind,a){let card=payCards.querySelector('[data-kind="'+kind+'"]');if(!card||!betDefs[kind])return;
-let w=betDefs[kind].calc(a);card.querySelector('[data-bet]').textContent=fmt(a);card.querySelector('[data-pay]').textContent=fmt(w);dealerStatus.textContent=fmt(a)+' pays '+fmt(w)+'.';voiceSpeak('Payout is '+fmt(w).replace('$','')+' dollars')}
-const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-let vr=null;
-function voiceListen(mode,button){unlockSpeech();if(!vr){dealerStatus.textContent='Voice recognition is not available in this browser.';return}
-voiceMode=mode;document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening'));button.classList.add('listening');dealerStatus.textContent=mode==='roll'?'Listening for the roll…':'Listening for the bet amount…';try{vr.start()}
-catch(e){}}
-if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults=false;vr.maxAlternatives=3;vr.addEventListener('result',e=>{let raw=e.results[0][0].transcript;if(voiceMode==='roll'){let r=parseRoll(raw);if(r)setVoiceRoll(r,raw);else{rollHeard.textContent='Heard: “'+raw+'”';dealerStatus.textContent='I did not understand that roll.'}}
-else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}
-else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
+renderVoiceCards(kinds);let instruction=dealerInstructionFor(state,r);dealerCall.textContent=instruction.call;dealerAction.textContent=instruction.action;let msg=pointMessage(state,r);let comeNote=comeEvent==='traveled'?' Come bet moved to '+r.total+'. Add odds if needed.':comeEvent==='establishedWinOdds'?' Come '+r.total+' and odds win.':comeEvent==='establishedWin'?' Come '+r.total+' wins.':comeEvent==='establishedLostOdds'?' Established Come bets and odds lose.':comeEvent==='establishedLost'?' Established Come bets lose.':comeEvent==='sevenOutBothOdds'?' Established Come bets and odds lose.':comeEvent==='sevenOutBoth'?' Established Come bets lose.':comeEvent==='comeBoxWin'?'':comeEvent==='comeBoxLoss'?' Come-box bet loses.':'';let placeNote=state.event==='sevenOut'&&placeNumbers.length?' Take the Place bets.':'';let comeBoxNote=(comeEvent==='sevenOutBothOdds'||comeEvent==='sevenOutBoth'||comeEvent==='comeBoxWin')?' Pay the Come box.':'';if(state.event==='sevenOut')placeNumbers=[];let closing=state.event==='sevenOut'?' Point is off. New come-out roll.':'';let fullCall=msg+comeNote+placeNote+comeBoxNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');voiceSpeak(fullCall,true)}
+function setVoiceBet(kind,a){let card=payCards.querySelector('[data-kind="'+kind+'"]');if(!card||!betDefs[kind])return;let w=betDefs[kind].calc(a);card.querySelector('[data-bet]').textContent=fmt(a);card.querySelector('[data-pay]').textContent=fmt(w);dealerStatus.textContent=fmt(a)+' pays '+fmt(w)+'.';voiceSpeak('Payout is '+fmt(w).replace('$','')+' dollars')}
+const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;let vr=null;function voiceListen(mode,button){unlockSpeech();if(!vr){dealerStatus.textContent='Voice recognition is not available in this browser.';return}voiceMode=mode;document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening'));button.classList.add('listening');dealerStatus.textContent=mode==='roll'?'Listening for the roll…':'Listening for the bet amount…';try{vr.start()}catch(e){}}
+if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults=false;vr.maxAlternatives=3;vr.addEventListener('result',e=>{let raw=e.results[0][0].transcript;if(voiceMode==='roll'){let r=parseRoll(raw);if(r)setVoiceRoll(r,raw);else{rollHeard.textContent='Heard: “'+raw+'”';dealerStatus.textContent='I did not understand that roll.'}}else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
 repeatCallBtn.addEventListener('click',()=>{if(!lastDealerCall)return;dealerStatus.textContent='Repeating: '+lastDealerCall;voiceSpeak(lastDealerCall)});
-passOddsBtn.addEventListener('click',()=>{if(point===null)return;passOddsWorking=!passOddsWorking;updatePointDisplay();dealerStatus.textContent='Pass line odds '+(passOddsWorking?'working.':'removed.');voiceSpeak('Pass line odds '+(passOddsWorking?'working.':'removed.'))});comeBetBtn.addEventListener('click',()=>{if(point===null||comeWorking)return;comeWorking=true;updateComeDisplay();dealerStatus.textContent='Come bet is working on the next roll.';voiceSpeak('Come bet working.')});
+comeBetBtn.addEventListener('click',()=>{if(point===null||comeWorking)return;comeWorking=true;updateComeDisplay();dealerStatus.textContent='Come bet is working on the next roll.';voiceSpeak('Come bet working.')});
 rollMic.addEventListener('click',()=>voiceListen('roll',rollMic));
 betTypeButtons.forEach(btn=>btn.onclick=()=>{selectedType=btn.dataset.type;betTypeButtons.forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");renderNumbers();calculate()});amountInput.oninput=calculate;sameBetBtn.onclick=()=>{selectedNumber=null;hornHighNumber=null;hornHighRoll=null;Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));subSection.classList.add("hidden");resetAmount();renderNumbers();calculate()};clearBtn.onclick=()=>{amountInput.value="";selectedType=null;selectedNumber=null;hornHighNumber=null;hornHighRoll=null;betTypeButtons.forEach(b=>b.classList.remove("selected"));numberSection.classList.add("hidden");subSection.classList.add("hidden");amountSection.classList.add("hidden");calculate()};updatePointDisplay();calculate();
-</script>
-</body>
-</html>
+</script></body></html>
