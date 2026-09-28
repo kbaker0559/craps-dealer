@@ -42,6 +42,14 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .dice-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .dice-choice{min-height:74px;font-size:30px;font-weight:950;border:2px solid #fff;border-radius:12px;background:#173f2b;color:#fff}
 .dice-choice small{display:block;font-size:13px;margin-top:3px;color:#fde68a}
+
+.locked-roll{margin:10px 0 2px;padding:10px;border:2px solid #facc15;border-radius:14px;background:rgba(0,0,0,.18);text-align:center}
+.locked-roll.hidden{display:none}
+.locked-title{font-size:18px;font-weight:1000;color:#fde68a;letter-spacing:.04em;margin-bottom:8px}
+.locked-dice{display:flex;gap:14px;justify-content:center;align-items:center}
+.locked-die{width:62px;height:62px;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center;border-radius:12px;background:#b91c1c;border:2px solid #fecaca;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.pip{width:10px;height:10px;border-radius:50%;background:#fff;visibility:hidden}
+.pip.on{visibility:visible}
 @media(max-width:520px){.dice-choices{grid-template-columns:1fr}.dice-choice{min-height:64px}}
 .roll-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center}
 .roll-label{font-size:18px;font-weight:950;letter-spacing:.12em;color:#fde68a}
@@ -110,6 +118,10 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <div id="diceConfirm" class="dice-confirm hidden">
 <div class="dice-confirm-title">CONFIRM THE DICE</div>
 <div id="diceChoices" class="dice-choices"></div>
+</div>
+<div id="lockedRoll" class="locked-roll hidden">
+<div id="lockedTitle" class="locked-title">ROLL LOCKED</div>
+<div id="lockedDice" class="locked-dice"></div>
 </div>
 <div class="point-state">
 <button id="passOddsBtn" class="come-btn" disabled>ADD PASS ODDS</button>
@@ -291,9 +303,14 @@ if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll 
 function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line'+(state.hadPassOdds?' and odds':'')+'. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line'+(state.hadPassOdds?' and odds':'')+'.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
 
 const diceFaces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+const lockedRoll=document.getElementById('lockedRoll'),lockedTitle=document.getElementById('lockedTitle'),lockedDice=document.getElementById('lockedDice');
+const pipMaps={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function dieMarkup(n){return '<div class="locked-die" aria-label="Die showing '+n+'">'+Array.from({length:9},(_,i)=>'<span class="pip '+(pipMaps[n].includes(i)?'on':'')+'"></span>').join('')+'</div>'}
+function lockedRollName(total,pair){if(pair[0]===pair[1]&&[4,6,8,10].includes(total))return 'HARD '+total;if([4,6,8,10].includes(total))return 'EASY '+total;if(total===2)return 'SNAKE EYES';if(total===3)return 'ACE-DEUCE';if(total===11)return 'YO 11';if(total===12)return 'BOXCARS';return String(total)}
+function showLockedDice(total,pair){lockedTitle.textContent='ROLL LOCKED — '+lockedRollName(total,pair);lockedDice.innerHTML=dieMarkup(pair[0])+dieMarkup(pair[1]);lockedRoll.classList.remove('hidden');diceDetail.textContent=''}
 function diceOptions(total){let out=[];for(let a=1;a<=6;a++){for(let b=a;b<=6;b++){if(a+b===total)out.push([a,b])}}return out}
-function showDiceConfirmation(r,heard){pendingRoll=r;pendingHeard=heard;rollDisplay.textContent=r.total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Heard: “'+heard+'”';payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(r.total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
-function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard)}
+function showDiceConfirmation(r,heard){pendingRoll=r;pendingHeard=heard;lockedRoll.classList.add('hidden');rollDisplay.textContent=r.total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Heard: “'+heard+'”';payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(r.total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
+function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard);showLockedDice(total,pair)}
 
 function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
