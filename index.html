@@ -36,6 +36,13 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .actions button{min-height:48px;font-size:17px;background:#d1d5db}
 .actions .primary{background:#facc15}
   .voice-panel{margin:0 0 14px;padding:14px;border-radius:20px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}
+.dice-confirm{margin:12px 0;padding:12px;border:2px solid #facc15;border-radius:14px;background:rgba(0,0,0,.18)}
+.dice-confirm.hidden{display:none}
+.dice-confirm-title{font-weight:950;letter-spacing:.08em;color:#fde68a;margin-bottom:10px}
+.dice-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dice-choice{min-height:74px;font-size:30px;font-weight:950;border:2px solid #fff;border-radius:12px;background:#173f2b;color:#fff}
+.dice-choice small{display:block;font-size:13px;margin-top:3px;color:#fde68a}
+@media(max-width:520px){.dice-choices{grid-template-columns:1fr}.dice-choice{min-height:64px}}
 .roll-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center}
 .roll-label{font-size:18px;font-weight:950;letter-spacing:.12em;color:#fde68a}
 .roll-display{font-size:68px;line-height:1;font-weight:1000;color:#facc15}
@@ -111,6 +118,10 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 </div>
 <button id="repeatCallBtn" class="repeat-btn" disabled>🔊 REPEAT CALL</button>
 <div id="rollHeard" class="voice-heard">
+</div>
+<div id="diceConfirm" class="dice-confirm hidden">
+<div class="dice-confirm-title">CONFIRM THE DICE</div>
+<div id="diceChoices" class="dice-choices"></div>
 </div>
 <div id="payCards" class="pay-cards hidden">
 </div>
@@ -205,8 +216,8 @@ if(v!==null){r.push(String(v));i+=u}
 else{r.push(x);i++}}
 return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn');
-let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='';
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices');
+let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='';
 let speechUnlocked=false;
 
 function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}
@@ -276,6 +287,11 @@ if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll 
 
 function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line'+(state.hadPassOdds?' and odds':'')+'. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line'+(state.hadPassOdds?' and odds':'')+'.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
 
+const diceFaces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function diceOptions(total){let out=[];for(let a=1;a<=6;a++){for(let b=a;b<=6;b++){if(a+b===total)out.push([a,b])}}return out}
+function showDiceConfirmation(r,heard){pendingRoll=r;pendingHeard=heard;rollDisplay.textContent=r.total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Heard: “'+heard+'”';payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(r.total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
+function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard)}
+
 function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
 let comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
@@ -297,7 +313,7 @@ let vr=null;
 function voiceListen(mode,button){unlockSpeech();if(!vr){dealerStatus.textContent='Voice recognition is not available in this browser.';return}
 voiceMode=mode;document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening'));button.classList.add('listening');dealerStatus.textContent=mode==='roll'?'Listening for the roll…':'Listening for the bet amount…';try{vr.start()}
 catch(e){}}
-if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults=false;vr.maxAlternatives=3;vr.addEventListener('result',e=>{let raw=e.results[0][0].transcript;if(voiceMode==='roll'){let r=parseRoll(raw);if(r)setVoiceRoll(r,raw);else{rollHeard.textContent='Heard: “'+raw+'”';dealerStatus.textContent='I did not understand that roll.'}}
+if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults=false;vr.maxAlternatives=3;vr.addEventListener('result',e=>{let raw=e.results[0][0].transcript;if(voiceMode==='roll'){let r=parseRoll(raw);if(r)showDiceConfirmation(r,raw);else{rollHeard.textContent='Heard: “'+raw+'”';dealerStatus.textContent='I did not understand that roll.'}}
 else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}
 else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
 repeatCallBtn.addEventListener('click',()=>{if(!lastDealerCall)return;dealerStatus.textContent='Repeating: '+lastDealerCall;voiceSpeak(lastDealerCall)});
