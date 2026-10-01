@@ -42,6 +42,12 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .dice-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .dice-choice{min-height:74px;font-size:30px;font-weight:950;border:2px solid #fff;border-radius:12px;background:#173f2b;color:#fff}
 .dice-choice small{display:block;font-size:13px;margin-top:3px;color:#fde68a}
+.roll-select{margin:12px 0;padding:12px;border:2px solid #facc15;border-radius:14px;background:rgba(0,0,0,.18)}
+.roll-select-title{font-weight:950;letter-spacing:.08em;color:#fde68a;margin-bottom:10px;text-align:center}
+.roll-totals{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.roll-total-btn{min-height:52px;font-size:22px;font-weight:1000;background:#facc15;color:#111827}
+.correct-roll{width:100%;min-height:48px;margin-top:10px;background:#fee2e2;color:#7f1d1d;font-size:16px}
+.correct-roll.hidden{display:none}
 
 .locked-roll{margin:10px 0 2px;padding:10px;border:2px solid #facc15;border-radius:14px;background:rgba(0,0,0,.18);text-align:center}
 .locked-roll.hidden{display:none}
@@ -57,7 +63,7 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .take-item{padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.08);font-size:17px;font-weight:900;text-align:center}
 .take-done{width:100%;min-height:54px;background:#facc15;color:#111827;font-size:17px}
 .take-done.complete{background:#bbf7d0}
-@media(max-width:520px){.dice-choices{grid-template-columns:1fr}.dice-choice{min-height:64px}}
+@media(max-width:520px){.dice-choices{grid-template-columns:1fr}.dice-choice{min-height:64px}.roll-totals{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .roll-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center}
 .roll-label{font-size:18px;font-weight:950;letter-spacing:.12em;color:#fde68a}
 .roll-display{font-size:68px;line-height:1;font-weight:1000;color:#facc15}
@@ -111,17 +117,21 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <div id="pointDisplay" class="point-value" aria-label="POINT OFF">OFF</div>
 <div id="pointPhase" class="point-phase">COME-OUT</div>
 </div>
+<div class="roll-select">
+<div class="roll-select-title">SELECT ROLL TOTAL</div>
+<div id="rollTotals" class="roll-totals"></div>
+</div>
 <div class="roll-row">
 <div>
 <div class="roll-label">ROLL IS</div>
 <div id="rollDisplay" class="roll-display">—</div>
-<div id="diceDetail" class="dice-detail">Tap the microphone and call the roll.</div>
+<div id="diceDetail" class="dice-detail">Tap the total, then tap the dice that actually rolled.</div>
 </div>
-<button id="rollMic" class="mic-btn">🎤</button>
+<button id="rollMic" class="mic-btn hidden" aria-hidden="true" tabindex="-1">🎤</button>
 </div>
 <button id="repeatCallBtn" class="repeat-btn" disabled>🔊 REPEAT CALL</button>
-<div id="rollHeard" class="voice-heard">
-</div>
+<button id="correctRollBtn" class="correct-roll hidden">↩ CORRECT ROLL</button>
+<div id="rollHeard" class="voice-heard"></div>
 <div id="diceConfirm" class="dice-confirm hidden">
 <div class="dice-confirm-title">CONFIRM THE DICE</div>
 <div id="diceChoices" class="dice-choices"></div>
@@ -151,7 +161,7 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 </div>
 <div id="payCards" class="pay-cards hidden">
 </div>
-<div id="dealerStatus" class="voice-status">Tap ROLL IS and say “Eight” or “8 hard.”</div>
+<div id="dealerStatus" class="voice-status">Select the roll total, then confirm the dice.</div>
 </div>
 <div class="manual-divider">MANUAL CALCULATOR</div>
 <label>Bet</label>
@@ -242,8 +252,8 @@ if(v!==null){r.push(String(v));i+=u}
 else{r.push(x);i++}}
 return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn');
-let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='';
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),correctRollBtn=document.getElementById('correctRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn');
+let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='',preRollSnapshot=null;
 let speechUnlocked=false;
 
 function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}
@@ -332,6 +342,11 @@ items.forEach(item=>{let row=document.createElement('div');row.className='take-i
 takeDoneBtn.textContent='DONE — LOSING BETS TAKEN';takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete');takeStep.classList.remove('hidden')}
 function clearTakeStep(){takeList.innerHTML='';takeStep.classList.add('hidden');takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete')}
 
+function capturePreRollState(){return{point,comeWorking,comeNumbers:[...comeNumbers],comeOddsNumbers:[...comeOddsNumbers],placeNumbers:[...placeNumbers],passOddsWorking,lastDealerCall,dealerCall:dealerCall.textContent,dealerAction:dealerAction.textContent}}
+function restorePreRollState(){if(!preRollSnapshot)return;point=preRollSnapshot.point;comeWorking=preRollSnapshot.comeWorking;comeNumbers=[...preRollSnapshot.comeNumbers];comeOddsNumbers=[...preRollSnapshot.comeOddsNumbers];placeNumbers=[...preRollSnapshot.placeNumbers];passOddsWorking=preRollSnapshot.passOddsWorking;lastDealerCall=preRollSnapshot.lastDealerCall;dealerCall.textContent=preRollSnapshot.dealerCall;dealerAction.textContent=preRollSnapshot.dealerAction;repeatCallBtn.disabled=!lastDealerCall;updatePointDisplay()}
+function resetRollEntry(){pendingRoll=null;pendingHeard='';currentRoll=null;currentDice=null;diceConfirm.classList.add('hidden');lockedRoll.classList.add('hidden');correctRollBtn.classList.add('hidden');clearTakeStep();payCards.innerHTML='';payCards.classList.add('hidden');rollDisplay.textContent='—';diceDetail.textContent='Tap the total, then tap the dice that actually rolled.';rollHeard.textContent='';dealerStatus.textContent='Select the roll total, then confirm the dice.'}
+function selectRollTotal(total){pendingRoll={total,dice:null,label:'Total '+total};pendingHeard='Selected '+total;lockedRoll.classList.add('hidden');correctRollBtn.classList.add('hidden');clearTakeStep();rollDisplay.textContent=total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Selected total: '+total;payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
+function buildRollTotals(){rollTotals.innerHTML='';for(let n=2;n<=12;n++){let b=document.createElement('button');b.className='roll-total-btn';b.textContent=n;b.addEventListener('click',()=>selectRollTotal(n));rollTotals.appendChild(b)}}
 const diceFaces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 const lockedRoll=document.getElementById('lockedRoll'),lockedTitle=document.getElementById('lockedTitle'),lockedDice=document.getElementById('lockedDice');
 const pipMaps={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
@@ -340,9 +355,9 @@ function lockedRollName(total,pair){if(pair[0]===pair[1]&&[4,6,8,10].includes(to
 function showLockedDice(total,pair){lockedTitle.textContent='ROLL LOCKED — '+lockedRollName(total,pair);lockedDice.innerHTML=dieMarkup(pair[0])+dieMarkup(pair[1]);lockedRoll.classList.remove('hidden');diceDetail.textContent=''}
 function diceOptions(total){let out=[];for(let a=1;a<=6;a++){for(let b=a;b<=6;b++){if(a+b===total)out.push([a,b])}}return out}
 function showDiceConfirmation(r,heard){pendingRoll=r;pendingHeard=heard;lockedRoll.classList.add('hidden');clearTakeStep();rollDisplay.textContent=r.total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Heard: “'+heard+'”';payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(r.total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
-function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard);showLockedDice(total,pair)}
+function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};preRollSnapshot=capturePreRollState();pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard,true);showLockedDice(total,pair);correctRollBtn.classList.remove('hidden')}
 
-function setVoiceRoll(r,heard){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
+function setVoiceRoll(r,heard,announceRoll=false){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,placeSnapshot=[...placeNumbers],state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
 let comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
 showTakeStep(takeItemsForRoll(state,comeEvent,placeSnapshot));
@@ -355,7 +370,7 @@ let comeNote=comeEvent==='traveled'?' Come bet moved to '+r.total+'. Add odds if
 let placeNote=state.event==='sevenOut'&&placeNumbers.length?' Take the Place bets.':'';
 let comeBoxNote=(comeEvent==='sevenOutBothOdds'||comeEvent==='sevenOutBoth'||comeEvent==='comeBoxWin')?' Pay the Come box.':'';if(state.event==='sevenOut')placeNumbers=[];
 let closing=state.event==='sevenOut'?' Point is off. New come-out roll.':'';
-let fullCall=msg+comeNote+placeNote+comeBoxNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();if(state.event==='pointMade'||state.event==='sevenOut')updatePointDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');voiceSpeak(fullCall,true)}
+let fullCall=msg+comeNote+placeNote+comeBoxNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();if(state.event==='pointMade'||state.event==='sevenOut')updatePointDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');if(announceRoll){lastDealerCall=fullCall;repeatCallBtn.disabled=!lastDealerCall;if('speechSynthesis'in window){try{speechSynthesis.cancel();let first=new SpeechSynthesisUtterance(rollCallSpeech(r).replace(/^Roll is/i,'The roll is'));first.volume=1;first.rate=1;let second=new SpeechSynthesisUtterance(fullCall);second.volume=1;second.rate=1;speechSynthesis.speak(first);speechSynthesis.speak(second)}catch(e){}}}else voiceSpeak(fullCall,true)}
 
 function setVoiceBet(kind,a){let card=payCards.querySelector('[data-kind="'+kind+'"]');if(!card||!betDefs[kind])return;
 let w=betDefs[kind].calc(a);card.querySelector('[data-bet]').textContent=fmt(a);card.querySelector('[data-pay]').textContent=fmt(w);dealerStatus.textContent=fmt(a)+' pays '+fmt(w)+'.';voiceSpeak('Payout is '+fmt(w).replace('$','')+' dollars')}
@@ -368,10 +383,11 @@ if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults
 else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}
 else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
 takeDoneBtn.addEventListener('click',()=>{takeDoneBtn.textContent='✓ TAKE COMPLETE';takeDoneBtn.disabled=true;takeDoneBtn.classList.add('complete');dealerStatus.textContent='TAKE complete. Ready for the remaining dealer actions.'});
+correctRollBtn.addEventListener('click',()=>{restorePreRollState();preRollSnapshot=null;resetRollEntry();dealerStatus.textContent='Roll corrected. Select the correct total.'});
 repeatCallBtn.addEventListener('click',()=>{if(!lastDealerCall)return;dealerStatus.textContent='Repeating: '+lastDealerCall;voiceSpeak(lastDealerCall)});
 passOddsBtn.addEventListener('click',()=>{if(point===null)return;passOddsWorking=!passOddsWorking;updatePointDisplay();dealerStatus.textContent='Pass line odds '+(passOddsWorking?'working.':'removed.');voiceSpeak('Pass line odds '+(passOddsWorking?'working.':'removed.'))});comeBetBtn.addEventListener('click',()=>{if(point===null||comeWorking)return;comeWorking=true;updateComeDisplay();dealerStatus.textContent='Come bet is working on the next roll.';voiceSpeak('Come bet working.')});
 rollMic.addEventListener('click',()=>voiceListen('roll',rollMic));
-betTypeButtons.forEach(btn=>btn.onclick=()=>{selectedType=btn.dataset.type;betTypeButtons.forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");renderNumbers();calculate()});amountInput.oninput=calculate;sameBetBtn.onclick=()=>{selectedNumber=null;hornHighNumber=null;hornHighRoll=null;Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));subSection.classList.add("hidden");resetAmount();renderNumbers();calculate()};clearBtn.onclick=()=>{amountInput.value="";selectedType=null;selectedNumber=null;hornHighNumber=null;hornHighRoll=null;betTypeButtons.forEach(b=>b.classList.remove("selected"));numberSection.classList.add("hidden");subSection.classList.add("hidden");amountSection.classList.add("hidden");calculate()};updatePointDisplay();calculate();
+betTypeButtons.forEach(btn=>btn.onclick=()=>{selectedType=btn.dataset.type;betTypeButtons.forEach(b=>b.classList.remove("selected"));btn.classList.add("selected");renderNumbers();calculate()});amountInput.oninput=calculate;sameBetBtn.onclick=()=>{selectedNumber=null;hornHighNumber=null;hornHighRoll=null;Array.from(numbersDiv.children).forEach(x=>x.classList.remove("selected"));subSection.classList.add("hidden");resetAmount();renderNumbers();calculate()};clearBtn.onclick=()=>{amountInput.value="";selectedType=null;selectedNumber=null;hornHighNumber=null;hornHighRoll=null;betTypeButtons.forEach(b=>b.classList.remove("selected"));numberSection.classList.add("hidden");subSection.classList.add("hidden");amountSection.classList.add("hidden");calculate()};buildRollTotals();updatePointDisplay();calculate();
 </script>
 </body>
 </html>
