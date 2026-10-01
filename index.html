@@ -117,9 +117,14 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <div id="pointDisplay" class="point-value" aria-label="POINT OFF">OFF</div>
 <div id="pointPhase" class="point-phase">COME-OUT</div>
 </div>
-<div class="roll-select">
+<div id="rollSelect" class="roll-select">
 <div class="roll-select-title">SELECT ROLL TOTAL</div>
 <div id="rollTotals" class="roll-totals"></div>
+</div>
+<div id="lockedRoll" class="locked-roll hidden">
+<div id="lockedTitle" class="locked-title">ROLL LOCKED</div>
+<div id="lockedDice" class="locked-dice"></div>
+<button id="correctRollBtn" class="correct-roll">↩ CORRECT ROLL</button>
 </div>
 <div class="roll-row">
 <div>
@@ -130,15 +135,10 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <button id="rollMic" class="mic-btn hidden" aria-hidden="true" tabindex="-1">🎤</button>
 </div>
 <button id="repeatCallBtn" class="repeat-btn" disabled>🔊 REPEAT CALL</button>
-<button id="correctRollBtn" class="correct-roll hidden">↩ CORRECT ROLL</button>
 <div id="rollHeard" class="voice-heard"></div>
 <div id="diceConfirm" class="dice-confirm hidden">
 <div class="dice-confirm-title">CONFIRM THE DICE</div>
 <div id="diceChoices" class="dice-choices"></div>
-</div>
-<div id="lockedRoll" class="locked-roll hidden">
-<div id="lockedTitle" class="locked-title">ROLL LOCKED</div>
-<div id="lockedDice" class="locked-dice"></div>
 </div>
 <div id="takeStep" class="take-step hidden">
 <div class="take-title">TAKE — LOSING BETS</div>
@@ -252,7 +252,7 @@ if(v!==null){r.push(String(v));i+=u}
 else{r.push(x);i++}}
 return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),correctRollBtn=document.getElementById('correctRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn');
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),rollSelect=document.getElementById('rollSelect'),correctRollBtn=document.getElementById('correctRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn');
 let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='',preRollSnapshot=null;
 let speechUnlocked=false;
 
@@ -344,18 +344,18 @@ function clearTakeStep(){takeList.innerHTML='';takeStep.classList.add('hidden');
 
 function capturePreRollState(){return{point,comeWorking,comeNumbers:[...comeNumbers],comeOddsNumbers:[...comeOddsNumbers],placeNumbers:[...placeNumbers],passOddsWorking,lastDealerCall,dealerCall:dealerCall.textContent,dealerAction:dealerAction.textContent}}
 function restorePreRollState(){if(!preRollSnapshot)return;point=preRollSnapshot.point;comeWorking=preRollSnapshot.comeWorking;comeNumbers=[...preRollSnapshot.comeNumbers];comeOddsNumbers=[...preRollSnapshot.comeOddsNumbers];placeNumbers=[...preRollSnapshot.placeNumbers];passOddsWorking=preRollSnapshot.passOddsWorking;lastDealerCall=preRollSnapshot.lastDealerCall;dealerCall.textContent=preRollSnapshot.dealerCall;dealerAction.textContent=preRollSnapshot.dealerAction;repeatCallBtn.disabled=!lastDealerCall;updatePointDisplay()}
-function resetRollEntry(){pendingRoll=null;pendingHeard='';currentRoll=null;currentDice=null;diceConfirm.classList.add('hidden');lockedRoll.classList.add('hidden');correctRollBtn.classList.add('hidden');clearTakeStep();payCards.innerHTML='';payCards.classList.add('hidden');rollDisplay.textContent='—';diceDetail.textContent='Tap the total, then tap the dice that actually rolled.';rollHeard.textContent='';dealerStatus.textContent='Select the roll total, then confirm the dice.'}
-function selectRollTotal(total){pendingRoll={total,dice:null,label:'Total '+total};pendingHeard='Selected '+total;lockedRoll.classList.add('hidden');correctRollBtn.classList.add('hidden');clearTakeStep();rollDisplay.textContent=total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Selected total: '+total;payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
+function resetRollEntry(){pendingRoll=null;pendingHeard='';currentRoll=null;currentDice=null;diceConfirm.classList.add('hidden');lockedRoll.classList.add('hidden');rollSelect.classList.remove('hidden');clearTakeStep();payCards.innerHTML='';payCards.classList.add('hidden');rollDisplay.textContent='—';diceDetail.textContent='Tap the total, then tap the dice that actually rolled.';rollHeard.textContent='';dealerStatus.textContent='Select the roll total, then confirm the dice.'}
+function selectRollTotal(total){pendingRoll={total,dice:null,label:'Total '+total};pendingHeard='Selected '+total;lockedRoll.classList.add('hidden');rollSelect.classList.remove('hidden');clearTakeStep();rollDisplay.textContent=total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Selected total: '+total;payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
 function buildRollTotals(){rollTotals.innerHTML='';for(let n=2;n<=12;n++){let b=document.createElement('button');b.className='roll-total-btn';b.textContent=n;b.addEventListener('click',()=>selectRollTotal(n));rollTotals.appendChild(b)}}
 const diceFaces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 const lockedRoll=document.getElementById('lockedRoll'),lockedTitle=document.getElementById('lockedTitle'),lockedDice=document.getElementById('lockedDice');
 const pipMaps={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 function dieMarkup(n){return '<div class="locked-die" aria-label="Die showing '+n+'">'+Array.from({length:9},(_,i)=>'<span class="pip '+(pipMaps[n].includes(i)?'on':'')+'"></span>').join('')+'</div>'}
 function lockedRollName(total,pair){if(pair[0]===pair[1]&&[4,6,8,10].includes(total))return 'HARD '+total;if([4,6,8,10].includes(total))return 'EASY '+total;if(total===2)return 'SNAKE EYES';if(total===3)return 'ACE-DEUCE';if(total===11)return 'YO 11';if(total===12)return 'BOXCARS';return String(total)}
-function showLockedDice(total,pair){lockedTitle.textContent='ROLL LOCKED — '+lockedRollName(total,pair);lockedDice.innerHTML=dieMarkup(pair[0])+dieMarkup(pair[1]);lockedRoll.classList.remove('hidden');diceDetail.textContent=''}
+function showLockedDice(total,pair){lockedTitle.textContent='ROLL LOCKED — '+lockedRollName(total,pair);lockedDice.innerHTML=dieMarkup(pair[0])+dieMarkup(pair[1]);rollSelect.classList.add('hidden');lockedRoll.classList.remove('hidden');diceDetail.textContent=''}
 function diceOptions(total){let out=[];for(let a=1;a<=6;a++){for(let b=a;b<=6;b++){if(a+b===total)out.push([a,b])}}return out}
 function showDiceConfirmation(r,heard){pendingRoll=r;pendingHeard=heard;lockedRoll.classList.add('hidden');clearTakeStep();rollDisplay.textContent=r.total;diceDetail.textContent='Choose the dice that actually rolled.';rollHeard.textContent='Heard: “'+heard+'”';payCards.innerHTML='';payCards.classList.add('hidden');diceChoices.innerHTML='';diceOptions(r.total).forEach(pair=>{let b=document.createElement('button');b.className='dice-choice';b.innerHTML=diceFaces[pair[0]]+' '+diceFaces[pair[1]]+'<small>'+pair[0]+' + '+pair[1]+'</small>';b.addEventListener('click',()=>confirmDice(pair));diceChoices.appendChild(b)});diceConfirm.classList.remove('hidden');dealerStatus.textContent='Confirm the dice before the roll is processed.'}
-function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};preRollSnapshot=capturePreRollState();pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard,true);showLockedDice(total,pair);correctRollBtn.classList.remove('hidden')}
+function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,heard=pendingHeard,label=(pair[0]===pair[1]&&[4,6,8,10].includes(total)?'Hard '+total:total===2?'Snake Eyes':total===3?'Ace-Deuce':total===11?'Yo 11':total===12?'Boxcars':'Total '+total)+' · '+pair[0]+' + '+pair[1];let r={total,dice:[pair[0],pair[1]],label};preRollSnapshot=capturePreRollState();pendingRoll=null;pendingHeard='';diceConfirm.classList.add('hidden');setVoiceRoll(r,heard,true);showLockedDice(total,pair)}
 
 function setVoiceRoll(r,heard,announceRoll=false){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,placeSnapshot=[...placeNumbers],state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
