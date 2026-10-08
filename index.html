@@ -172,9 +172,16 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <button id="takeDoneBtn" class="take-done">DONE — LOSING BETS TAKEN</button>
 </div>
 <div id="payStep" class="workflow-step hidden">
-<div class="workflow-title">PAY — WINNING BETS</div>
+<div class="workflow-title">PAY — COME BETS</div>
 <div id="payList" class="workflow-list"></div>
-<button id="payDoneBtn" class="workflow-done">DONE — WINNING BETS PAID</button>
+<button id="payDoneBtn" class="workflow-done">DONE — COME BETS PAID</button>
+</div>
+<div id="payPlaceStep" class="workflow-step hidden">
+<div class="workflow-title">PAY — PLACE BETS</div>
+<div id="payPlaceList" class="workflow-list"></div>
+<div class="place-payout-helper">Select a Place bet amount below to calculate net winnings.</div>
+<div id="placePayoutControls" class="place-payout-controls"></div>
+<button id="payPlaceDoneBtn" class="workflow-done">DONE — PLACE BETS PAID</button>
 </div>
 <div id="returnStep" class="workflow-step hidden">
 <div class="workflow-title">RETURN — OFF ODDS</div>
@@ -293,10 +300,10 @@ if(v!==null){r.push(String(v));i+=u}
 else{r.push(x);i++}}
 return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),rollSelect=document.getElementById('rollSelect'),correctRollBtn=document.getElementById('correctRollBtn'),nextRollBtn=document.getElementById('nextRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn'),payStep=document.getElementById('payStep'),payList=document.getElementById('payList'),payDoneBtn=document.getElementById('payDoneBtn'),returnStep=document.getElementById('returnStep'),returnList=document.getElementById('returnList'),returnDoneBtn=document.getElementById('returnDoneBtn'),moveStep=document.getElementById('moveStep'),moveList=document.getElementById('moveList'),moveDoneBtn=document.getElementById('moveDoneBtn');
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),rollSelect=document.getElementById('rollSelect'),correctRollBtn=document.getElementById('correctRollBtn'),nextRollBtn=document.getElementById('nextRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn'),payStep=document.getElementById('payStep'),payList=document.getElementById('payList'),payDoneBtn=document.getElementById('payDoneBtn'),payPlaceStep=document.getElementById('payPlaceStep'),payPlaceList=document.getElementById('payPlaceList'),placePayoutControls=document.getElementById('placePayoutControls'),payPlaceDoneBtn=document.getElementById('payPlaceDoneBtn'),returnStep=document.getElementById('returnStep'),returnList=document.getElementById('returnList'),returnDoneBtn=document.getElementById('returnDoneBtn'),moveStep=document.getElementById('moveStep'),moveList=document.getElementById('moveList'),moveDoneBtn=document.getElementById('moveDoneBtn');
 let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='',preRollSnapshot=null;
 let speechUnlocked=false;
-let rollWorkflow={take:[],pay:[],returns:[],move:[]},workflowStage='';
+let rollWorkflow={take:[],pay:[],payPlace:[],returns:[],move:[]},workflowStage='';
 
 function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}
 catch(e){}}
@@ -393,8 +400,9 @@ if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll 
 
 function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line'+(state.hadPassOdds?' and odds':'')+'. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line'+(state.hadPassOdds?' and odds':'')+'.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
 
+// Dealer payment priority: TAKE, PAY COME, PAY PLACE, RETURN, MOVE.
 function workflowForRoll(state,comeEvent,placeSnapshot){
-let wf={take:[],pay:[],returns:[],move:[]};
+let wf={take:[],pay:[],payPlace:[],returns:[],move:[]};
 if(state.event==='comeoutCraps')wf.take.push('Pass Line');
 if(state.event==='comeoutWin')wf.pay.push('Pass Line');
 if(state.event==='pointMade')wf.pay.push(state.hadPassOdds?'Pass Line + Odds':'Pass Line');
@@ -404,6 +412,7 @@ if(state.event==='sevenOut'){
   if(placeSnapshot.length)wf.take.push('Place Bets: '+placeSnapshot.join(', '));
   if(comeEvent&&comeEvent.hadWorking)wf.pay.push('Come Box Bet');
 }
+if(state.oldPoint!==null && [4,5,6,8,9,10].includes(currentRoll) && placeSnapshot.includes(currentRoll))wf.payPlace.push('Place '+currentRoll);
 if(comeEvent){
   if(comeEvent.type==='comeBoxLoss')wf.take.push('Come Box Bet');
   if(comeEvent.type==='comeBoxWin')wf.pay.push('Come Box Bet');
@@ -420,17 +429,30 @@ if(comeEvent){
 }
 return wf}
 function renderWorkflowList(listEl,items){listEl.innerHTML='';items.forEach(item=>{let row=document.createElement('div');row.className=listEl===takeList?'take-item':'workflow-item';row.textContent=item;listEl.appendChild(row)})}
-function hideAllWorkflowSteps(){takeStep.classList.add('hidden');payStep.classList.add('hidden');returnStep.classList.add('hidden');moveStep.classList.add('hidden')}
-function resetWorkflowButtons(){takeDoneBtn.textContent='DONE — LOSING BETS TAKEN';takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete');payDoneBtn.textContent='DONE — WINNING BETS PAID';payDoneBtn.disabled=false;payDoneBtn.classList.remove('complete');returnDoneBtn.textContent='DONE — ODDS RETURNED';returnDoneBtn.disabled=false;returnDoneBtn.classList.remove('complete');moveDoneBtn.textContent='DONE — COME BET MOVED';moveDoneBtn.disabled=false;moveDoneBtn.classList.remove('complete')}
+function hideAllWorkflowSteps(){takeStep.classList.add('hidden');payStep.classList.add('hidden');payPlaceStep.classList.add('hidden');returnStep.classList.add('hidden');moveStep.classList.add('hidden')}
+function resetWorkflowButtons(){takeDoneBtn.textContent='DONE — LOSING BETS TAKEN';takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete');payDoneBtn.textContent='DONE — COME BETS PAID';payDoneBtn.disabled=false;payDoneBtn.classList.remove('complete');payPlaceDoneBtn.textContent='DONE — PLACE BETS PAID';payPlaceDoneBtn.disabled=false;payPlaceDoneBtn.classList.remove('complete');returnDoneBtn.textContent='DONE — ODDS RETURNED';returnDoneBtn.disabled=false;returnDoneBtn.classList.remove('complete');moveDoneBtn.textContent='DONE — COME BET MOVED';moveDoneBtn.disabled=false;moveDoneBtn.classList.remove('complete')}
 function showCurrentWorkflow(){
   hideAllWorkflowSteps();nextRollBtn.classList.add('hidden');
-  let order=['take','pay','returns','move'],next=order.find(k=>rollWorkflow[k].length);
+  let order=['take','pay','payPlace','returns','move'],next=order.find(k=>rollWorkflow[k].length);
   workflowStage=next||'';
   if(!next){nextRollBtn.classList.remove('hidden');promoteCurrentTableState();return}
   if(next==='take'){renderWorkflowList(takeList,rollWorkflow.take);takeStep.classList.remove('hidden')}
   if(next==='pay'){renderWorkflowList(payList,rollWorkflow.pay);payStep.classList.remove('hidden')}
+  if(next==='payPlace'){renderWorkflowList(payPlaceList,rollWorkflow.payPlace);renderPlacePayoutControls();payPlaceStep.classList.remove('hidden')}
   if(next==='returns'){renderWorkflowList(returnList,rollWorkflow.returns);returnStep.classList.remove('hidden')}
   if(next==='move'){renderWorkflowList(moveList,rollWorkflow.move);moveStep.classList.remove('hidden')}
+}
+function renderPlacePayoutControls(){
+  placePayoutControls.innerHTML='';
+  rollWorkflow.payPlace.forEach(item=>{
+    const n=Number(item.replace('Place ',''));
+    const row=document.createElement('div');row.className='workflow-item';
+    const title=document.createElement('strong');title.textContent='PLACE '+n+' — '+multiplier('place',n)[1];
+    const amount=document.createElement('input');amount.type='number';amount.inputMode='decimal';amount.min='0';amount.step='0.01';amount.placeholder='Bet amount ($)';amount.setAttribute('aria-label','Place '+n+' bet amount');
+    const result=document.createElement('div');result.textContent='NET WINNINGS: —';
+    amount.addEventListener('input',()=>{const a=Number(amount.value);result.textContent=amount.value!==''&&Number.isFinite(a)&&a>=0?'NET WINNINGS: '+fmt(a*multiplier('place',n)[0]):'NET WINNINGS: —'});
+    row.append(title,amount,result);placePayoutControls.appendChild(row);
+  });
 }
 function completeWorkflowStage(stage){rollWorkflow[stage]=[];showCurrentWorkflow()}
 function promoteCurrentTableState(){
@@ -438,7 +460,7 @@ function promoteCurrentTableState(){
   else dealerInstruction.classList.remove('table-state-prominent');
 }
 function startWorkflow(wf){rollWorkflow=wf;resetWorkflowButtons();showCurrentWorkflow()}
-function clearTakeStep(){rollWorkflow={take:[],pay:[],returns:[],move:[]};workflowStage='';hideAllWorkflowSteps();resetWorkflowButtons();dealerInstruction.classList.remove('table-state-prominent')}
+function clearTakeStep(){rollWorkflow={take:[],pay:[],payPlace:[],returns:[],move:[]};workflowStage='';hideAllWorkflowSteps();resetWorkflowButtons();dealerInstruction.classList.remove('table-state-prominent')}
 
 function capturePreRollState(){return{point,comeWorking,comeNumbers:[...comeNumbers],comeOddsNumbers:[...comeOddsNumbers],placeNumbers:[...placeNumbers],passOddsWorking,lastDealerCall,dealerCall:dealerCall.textContent,dealerAction:dealerAction.textContent}}
 function restorePreRollState(){if(!preRollSnapshot)return;point=preRollSnapshot.point;comeWorking=preRollSnapshot.comeWorking;comeNumbers=[...preRollSnapshot.comeNumbers];comeOddsNumbers=[...preRollSnapshot.comeOddsNumbers];placeNumbers=[...preRollSnapshot.placeNumbers];passOddsWorking=preRollSnapshot.passOddsWorking;lastDealerCall=preRollSnapshot.lastDealerCall;dealerCall.textContent=preRollSnapshot.dealerCall;dealerAction.textContent=preRollSnapshot.dealerAction;repeatCallBtn.disabled=!lastDealerCall;updatePointDisplay()}
@@ -489,7 +511,8 @@ if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults
 else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}
 else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
 takeDoneBtn.addEventListener('click',()=>{takeDoneBtn.textContent='✓ TAKE COMPLETE';takeDoneBtn.disabled=true;takeDoneBtn.classList.add('complete');completeWorkflowStage('take');dealerStatus.textContent='TAKE complete. Continue to the next dealer action.'});
-payDoneBtn.addEventListener('click',()=>{payDoneBtn.textContent='✓ PAY COMPLETE';payDoneBtn.disabled=true;payDoneBtn.classList.add('complete');completeWorkflowStage('pay');dealerStatus.textContent='PAY complete. Continue to the next dealer action.'});
+payDoneBtn.addEventListener('click',()=>{payDoneBtn.textContent='✓ COME PAY COMPLETE';payDoneBtn.disabled=true;payDoneBtn.classList.add('complete');completeWorkflowStage('pay');dealerStatus.textContent='COME PAY complete. Continue to the next dealer action.'});
+payPlaceDoneBtn.addEventListener('click',()=>{payPlaceDoneBtn.textContent='✓ PLACE PAY COMPLETE';payPlaceDoneBtn.disabled=true;payPlaceDoneBtn.classList.add('complete');completeWorkflowStage('payPlace');dealerStatus.textContent='PLACE PAY complete. Continue to the next dealer action.'});
 returnDoneBtn.addEventListener('click',()=>{returnDoneBtn.textContent='✓ RETURN COMPLETE';returnDoneBtn.disabled=true;returnDoneBtn.classList.add('complete');completeWorkflowStage('returns');dealerStatus.textContent='RETURN complete. Continue to the next dealer action.'});
 moveDoneBtn.addEventListener('click',()=>{moveDoneBtn.textContent='✓ MOVE COMPLETE';moveDoneBtn.disabled=true;moveDoneBtn.classList.add('complete');completeWorkflowStage('move');dealerStatus.textContent='MOVE complete. Ready for the next roll.'});
 correctRollBtn.addEventListener('click',()=>{restorePreRollState();preRollSnapshot=null;resetRollEntry();dealerStatus.textContent='Roll corrected. Select the correct total.'});
