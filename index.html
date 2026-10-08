@@ -32,6 +32,12 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .payout-label{margin-top:6px;color:#fde68a;font-size:18px;font-weight:950;letter-spacing:.14em}
 .payout{margin:2px 0 4px;font-size:72px;line-height:.98;font-weight:1000;color:var(--gold);text-shadow:0 3px 0 rgba(0,0,0,.35)}
 .formula{color:#d1fae5;font-size:12px;min-height:17px}
+.pays-display{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:8px;font-weight:1000;line-height:1.15;text-align:center;margin:12px 0}
+.pays-bet{font-size:clamp(27px,5vw,44px);color:#fff}
+.pays-word{font-size:clamp(17px,3vw,26px);color:#fde68a}
+.pays-win{font-size:clamp(34px,6vw,56px);color:#86efac}
+.place-payout-controls .workflow-item input{max-width:100%;box-sizing:border-box}
+.pay-line [data-pay]{color:#86efac}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
 .actions button{min-height:48px;font-size:17px;background:#d1d5db}
 .actions .primary{background:#facc15}
@@ -244,7 +250,7 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 </span>
 </div>
 <div class="payout-label">PAYOUT</div>
-<div class="payout" id="payOut">$0</div>
+<div class="pays-display"><span class="pays-bet" id="betOut">$0</span><span class="pays-word">PAYS</span><span class="pays-win" id="payOut">$0</span></div>
 <div class="formula" id="formulaOut">Choose a bet type.</div>
 </div>
 <div class="actions">
@@ -286,7 +292,7 @@ subSection.classList.add("hidden");showAmount()};numbersDiv.appendChild(b)})}
 
 function hornHighPayout(bet,high,roll){const unit=bet/5,winningUnits=roll===high?2:1,losingUnits=5-winningUnits,odds=(roll===2||roll===12)?30:15;return winningUnits*unit*odds-losingUnits*unit}
 
-function calculate(){const bet=parseFloat(amountInput.value||"0");typeOut.textContent=selectedType?labels[selectedType]:"—";if(selectedType==="prop"&&selectedNumber==="Horn High"){numOut.textContent=hornHighNumber?(hornHighRoll?`High ${hornHighNumber} / Roll ${hornHighRoll}`:`High ${hornHighNumber}`):"Horn High";if(!hornHighNumber){payOut.textContent="$0";formulaOut.textContent="Choose the Horn High number.";return}
+function calculate(){const bet=parseFloat(amountInput.value||"0");document.getElementById('betOut').textContent=fmt(bet);typeOut.textContent=selectedType?labels[selectedType]:"—";if(selectedType==="prop"&&selectedNumber==="Horn High"){numOut.textContent=hornHighNumber?(hornHighRoll?`High ${hornHighNumber} / Roll ${hornHighRoll}`:`High ${hornHighNumber}`):"Horn High";if(!hornHighNumber){payOut.textContent="$0";formulaOut.textContent="Choose the Horn High number.";return}
 if(!hornHighRoll){payOut.textContent="$0";formulaOut.textContent="Choose the roll.";return}
 payOut.textContent=fmt(hornHighPayout(bet,hornHighNumber,hornHighRoll));formulaOut.textContent=`Horn High ${hornHighNumber}: ${hornHighRoll===hornHighNumber?"2":"1"} unit${hornHighRoll===hornHighNumber?"s":""} wins; losing portions deducted`;return}
 numOut.textContent=selectedNumber??"—";if(!selectedType||selectedNumber===null){payOut.textContent="$0";formulaOut.textContent=selectedType?"Choose a number/result.":"Choose a bet type.";return}
@@ -345,7 +351,7 @@ function betsForRoll(r){let a=[];if([4,5,6,8,9,10].includes(r.total))a.push('odd
 
 function cardTitle(kind){let t=betDefs[kind].title;if(['odds','place','buy','hard'].includes(kind))t+=' '+currentRoll;return t}
 
-function renderVoiceCards(kinds){payCards.innerHTML='';payCards.classList.toggle('hidden',!kinds.length);kinds.forEach(kind=>{let c=document.createElement('div');c.className='pay-card';c.dataset.kind=kind;c.innerHTML='<div class="pay-title">'+cardTitle(kind)+'</div><button class="mic-btn small" data-voice-kind="'+kind+'">🎤</button><div class="bet-line">BET <strong data-bet>—</strong></div><div class="pay-line">PAYOUT <strong data-pay>—</strong></div>';payCards.appendChild(c)});payCards.querySelectorAll('[data-voice-kind]').forEach(b=>b.addEventListener('click',()=>voiceListen(b.dataset.voiceKind,b)))}
+function renderVoiceCards(kinds){payCards.innerHTML='';payCards.classList.toggle('hidden',!kinds.length);kinds.forEach(kind=>{let c=document.createElement('div');c.className='pay-card';c.dataset.kind=kind;c.innerHTML='<div class="pay-title">'+cardTitle(kind)+'</div><button class="mic-btn small" data-voice-kind="'+kind+'">🎤</button><div class="pays-display"><span class="pays-bet" data-bet>—</span><span class="pays-word">PAYS</span><span class="pays-win" data-pay>—</span></div>';payCards.appendChild(c)});payCards.querySelectorAll('[data-voice-kind]').forEach(b=>b.addEventListener('click',()=>voiceListen(b.dataset.voiceKind,b)))}
 
 function updateComeDisplay(){let parts=[];if(comeWorking)parts.push('WORKING');if(comeNumbers.length)parts.push(comeNumbers.map(n=>n+(comeOddsNumbers.includes(n)?(point===null?' + ODDS (OFF)':' + ODDS'):'')).join(' · '));comeState.textContent='COME: '+(parts.length?parts.join(' · '):'—');comeBetBtn.disabled=point===null||comeWorking;comeBetBtn.textContent=comeWorking?'COME BET WORKING':'COME BET';comeOddsControls.innerHTML='';comeNumbers.forEach(n=>{let b=document.createElement('button'),on=comeOddsNumbers.includes(n);b.textContent=on?'REMOVE ODDS '+n:'ADD ODDS '+n;b.addEventListener('click',()=>{if(on)comeOddsNumbers=comeOddsNumbers.filter(x=>x!==n);else comeOddsNumbers.push(n);updateComeDisplay();dealerStatus.textContent='Come '+n+' odds '+(on?'removed.':'working.');voiceSpeak('Come '+n+' odds '+(on?'removed.':'working.'))});comeOddsControls.appendChild(b)})}
 
@@ -449,8 +455,12 @@ function renderPlacePayoutControls(){
     const row=document.createElement('div');row.className='workflow-item';
     const title=document.createElement('strong');title.textContent='PLACE '+n+' — '+multiplier('place',n)[1];
     const amount=document.createElement('input');amount.type='number';amount.inputMode='decimal';amount.min='0';amount.step='0.01';amount.placeholder='Bet amount ($)';amount.setAttribute('aria-label','Place '+n+' bet amount');
-    const result=document.createElement('div');result.textContent='NET WINNINGS: —';
-    amount.addEventListener('input',()=>{const a=Number(amount.value);result.textContent=amount.value!==''&&Number.isFinite(a)&&a>=0?'NET WINNINGS: '+fmt(a*multiplier('place',n)[0]):'NET WINNINGS: —'});
+    const result=document.createElement('div');result.className='pays-display';
+    const betShown=document.createElement('span');betShown.className='pays-bet';betShown.textContent='—';
+    const paysWord=document.createElement('span');paysWord.className='pays-word';paysWord.textContent='PAYS';
+    const winShown=document.createElement('span');winShown.className='pays-win';winShown.textContent='—';
+    result.append(betShown,paysWord,winShown);
+    amount.addEventListener('input',()=>{const a=Number(amount.value);const valid=amount.value!==''&&Number.isFinite(a)&&a>=0;betShown.textContent=valid?fmt(a):'—';winShown.textContent=valid?fmt(a*multiplier('place',n)[0]):'—'});
     row.append(title,amount,result);placePayoutControls.appendChild(row);
   });
 }
