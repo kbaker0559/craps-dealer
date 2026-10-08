@@ -102,6 +102,29 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 .place-on{outline:2px solid #fff}
 .repeat-btn{width:100%;min-height:48px;margin-top:10px;border-radius:12px;font-size:17px;font-weight:900;background:#d1d5db;color:#111827}
 .repeat-btn:disabled{opacity:.45}
+
+.workflow-step{margin:12px 0;padding:13px;border:2px solid #facc15;border-radius:14px;background:rgba(0,0,0,.24)}
+.workflow-step.hidden{display:none}
+.workflow-title{font-size:19px;font-weight:1000;color:#fde68a;letter-spacing:.05em;text-align:center}
+.workflow-list{margin:9px 0 11px;display:grid;gap:7px}
+.workflow-item{padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.08);font-size:17px;font-weight:900;text-align:center}
+.workflow-done{width:100%;min-height:54px;background:#facc15;color:#111827;font-size:17px}
+.workflow-done.complete{background:#bbf7d0}
+.table-state-prominent .point-label{font-size:15px;color:#fde68a}
+.table-state-prominent .point-value{font-size:44px}
+.table-state-prominent .point-phase{font-size:20px;font-weight:1000;color:#fff}
+@media (orientation:landscape) and (min-width:700px){
+  body{padding:8px 12px}.app{max-width:1180px}h1{font-size:25px}.subtitle{margin-bottom:8px}.panel{padding:10px 12px}
+  .voice-panel{display:grid;grid-template-columns:minmax(330px,.9fr) minmax(420px,1.1fr);gap:12px;align-items:start;padding:10px}
+  .dealer-instruction,.point-state:first-of-type,.roll-select,.locked-roll,.roll-row,.repeat-btn,.voice-heard,.dice-confirm{grid-column:1}
+  .take-step,.workflow-step,.come-track,.come-odds,.place-track,.voice-status{grid-column:2}
+  .voice-panel>.point-state:not(:first-of-type){grid-column:2}
+  .dealer-instruction{margin-bottom:8px}.point-state{margin-bottom:8px}.roll-select,.locked-roll{margin:6px 0}
+  .roll-totals{grid-template-columns:repeat(6,minmax(0,1fr))}.roll-total-btn{min-height:46px}
+  .locked-die{width:72px;height:72px}.locked-title{font-size:22px}.roll-row{display:none}.repeat-btn{margin-top:6px}
+  .come-track,.place-track{margin-top:6px}.manual-divider{grid-column:1/-1}
+  .pay-cards{grid-column:2}.dealer-status{grid-column:2}
+}
 </style>
 </head>
 <body>
@@ -147,6 +170,21 @@ input{width:100%;border:0;outline:0;border-radius:20px;padding:14px 18px;font-si
 <div class="take-title">TAKE — LOSING BETS</div>
 <div id="takeList" class="take-list"></div>
 <button id="takeDoneBtn" class="take-done">DONE — LOSING BETS TAKEN</button>
+</div>
+<div id="payStep" class="workflow-step hidden">
+<div class="workflow-title">PAY — WINNING BETS</div>
+<div id="payList" class="workflow-list"></div>
+<button id="payDoneBtn" class="workflow-done">DONE — WINNING BETS PAID</button>
+</div>
+<div id="returnStep" class="workflow-step hidden">
+<div class="workflow-title">RETURN — OFF ODDS</div>
+<div id="returnList" class="workflow-list"></div>
+<button id="returnDoneBtn" class="workflow-done">DONE — ODDS RETURNED</button>
+</div>
+<div id="moveStep" class="workflow-step hidden">
+<div class="workflow-title">MOVE — COME BETS</div>
+<div id="moveList" class="workflow-list"></div>
+<button id="moveDoneBtn" class="workflow-done">DONE — COME BET MOVED</button>
 </div>
 <div class="point-state">
 <button id="passOddsBtn" class="come-btn" disabled>ADD PASS ODDS</button>
@@ -255,9 +293,10 @@ if(v!==null){r.push(String(v));i+=u}
 else{r.push(x);i++}}
 return r.join(" ")}
 // POINT OFF = come-out state; a box number establishes the point until point-made or seven-out.
-const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),rollSelect=document.getElementById('rollSelect'),correctRollBtn=document.getElementById('correctRollBtn'),nextRollBtn=document.getElementById('nextRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn');
+const rollMic=document.getElementById('rollMic'),rollDisplay=document.getElementById('rollDisplay'),diceDetail=document.getElementById('diceDetail'),rollHeard=document.getElementById('rollHeard'),dealerStatus=document.getElementById('dealerStatus'),payCards=document.getElementById('payCards'),pointDisplay=document.getElementById('pointDisplay'),pointPhase=document.getElementById('pointPhase'),dealerInstruction=document.getElementById('dealerInstruction'),dealerCall=document.getElementById('dealerCall'),dealerAction=document.getElementById('dealerAction'),comeState=document.getElementById('comeState'),comeBetBtn=document.getElementById('comeBetBtn'),comeOddsControls=document.getElementById('comeOddsControls'),placeState=document.getElementById('placeState'),placeControls=document.getElementById('placeControls'),passOddsBtn=document.getElementById('passOddsBtn'),repeatCallBtn=document.getElementById('repeatCallBtn'),diceConfirm=document.getElementById('diceConfirm'),diceChoices=document.getElementById('diceChoices'),rollTotals=document.getElementById('rollTotals'),rollSelect=document.getElementById('rollSelect'),correctRollBtn=document.getElementById('correctRollBtn'),nextRollBtn=document.getElementById('nextRollBtn'),takeStep=document.getElementById('takeStep'),takeList=document.getElementById('takeList'),takeDoneBtn=document.getElementById('takeDoneBtn'),payStep=document.getElementById('payStep'),payList=document.getElementById('payList'),payDoneBtn=document.getElementById('payDoneBtn'),returnStep=document.getElementById('returnStep'),returnList=document.getElementById('returnList'),returnDoneBtn=document.getElementById('returnDoneBtn'),moveStep=document.getElementById('moveStep'),moveList=document.getElementById('moveList'),moveDoneBtn=document.getElementById('moveDoneBtn');
 let currentRoll=null,currentDice=null,voiceMode=null,point=null,comeWorking=false,comeNumbers=[],comeOddsNumbers=[],placeNumbers=[],passOddsWorking=false,lastDealerCall='',pendingRoll=null,pendingHeard='',preRollSnapshot=null;
 let speechUnlocked=false;
+let rollWorkflow={take:[],pay:[],returns:[],move:[]},workflowStage='';
 
 function unlockSpeech(){if(!('speechSynthesis' in window)||speechUnlocked)return;try{const u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);speechUnlocked=true}
 catch(e){}}
@@ -301,50 +340,105 @@ function cardTitle(kind){let t=betDefs[kind].title;if(['odds','place','buy','har
 
 function renderVoiceCards(kinds){payCards.innerHTML='';payCards.classList.toggle('hidden',!kinds.length);kinds.forEach(kind=>{let c=document.createElement('div');c.className='pay-card';c.dataset.kind=kind;c.innerHTML='<div class="pay-title">'+cardTitle(kind)+'</div><button class="mic-btn small" data-voice-kind="'+kind+'">🎤</button><div class="bet-line">BET <strong data-bet>—</strong></div><div class="pay-line">PAYOUT <strong data-pay>—</strong></div>';payCards.appendChild(c)});payCards.querySelectorAll('[data-voice-kind]').forEach(b=>b.addEventListener('click',()=>voiceListen(b.dataset.voiceKind,b)))}
 
-function updateComeDisplay(){let parts=[];if(comeWorking)parts.push('WORKING');if(comeNumbers.length)parts.push(comeNumbers.map(n=>n+(comeOddsNumbers.includes(n)?' + ODDS':'')).join(' · '));comeState.textContent='COME: '+(parts.length?parts.join(' · '):'—');comeBetBtn.disabled=point===null||comeWorking;comeBetBtn.textContent=comeWorking?'COME BET WORKING':'COME BET';comeOddsControls.innerHTML='';comeNumbers.forEach(n=>{let b=document.createElement('button'),on=comeOddsNumbers.includes(n);b.textContent=on?'REMOVE ODDS '+n:'ADD ODDS '+n;b.addEventListener('click',()=>{if(on)comeOddsNumbers=comeOddsNumbers.filter(x=>x!==n);else comeOddsNumbers.push(n);updateComeDisplay();dealerStatus.textContent='Come '+n+' odds '+(on?'removed.':'working.');voiceSpeak('Come '+n+' odds '+(on?'removed.':'working.'))});comeOddsControls.appendChild(b)})}
+function updateComeDisplay(){let parts=[];if(comeWorking)parts.push('WORKING');if(comeNumbers.length)parts.push(comeNumbers.map(n=>n+(comeOddsNumbers.includes(n)?(point===null?' + ODDS (OFF)':' + ODDS'):'')).join(' · '));comeState.textContent='COME: '+(parts.length?parts.join(' · '):'—');comeBetBtn.disabled=point===null||comeWorking;comeBetBtn.textContent=comeWorking?'COME BET WORKING':'COME BET';comeOddsControls.innerHTML='';comeNumbers.forEach(n=>{let b=document.createElement('button'),on=comeOddsNumbers.includes(n);b.textContent=on?'REMOVE ODDS '+n:'ADD ODDS '+n;b.addEventListener('click',()=>{if(on)comeOddsNumbers=comeOddsNumbers.filter(x=>x!==n);else comeOddsNumbers.push(n);updateComeDisplay();dealerStatus.textContent='Come '+n+' odds '+(on?'removed.':'working.');voiceSpeak('Come '+n+' odds '+(on?'removed.':'working.'))});comeOddsControls.appendChild(b)})}
 
 function updatePlaceDisplay(){placeState.textContent='PLACE BETS: '+(placeNumbers.length?placeNumbers.join(' · '):'—')+(point===null&&placeNumbers.length?' (OFF ON COME-OUT)':'');placeControls.innerHTML='';[4,5,6,8,9,10].forEach(n=>{let b=document.createElement('button'),on=placeNumbers.includes(n);b.textContent=(on?'REMOVE PLACE ':'ADD PLACE ')+n;if(on)b.classList.add('place-on');b.addEventListener('click',()=>{if(on)placeNumbers=placeNumbers.filter(x=>x!==n);else placeNumbers.push(n);placeNumbers.sort((a,b)=>a-b);updatePlaceDisplay();dealerStatus.textContent='Place '+n+' '+(on?'removed.':'working.');voiceSpeak('Place '+n+' '+(on?'removed.':'working.'))});placeControls.appendChild(b)})}
 
 function updatePointDisplay(){pointDisplay.textContent=point===null?'OFF':point;pointPhase.textContent=point===null?'COME-OUT':'POINT IS '+point;passOddsBtn.disabled=point===null;passOddsBtn.textContent=passOddsWorking?'REMOVE PASS ODDS':'ADD PASS ODDS';updateComeDisplay();updatePlaceDisplay()}
 
-function applyComeState(r,state){if(state.oldPoint===null)return null;if(state.event==='sevenOut'){let hadWorking=comeWorking,hadEstablished=comeNumbers.length>0,hadOdds=comeOddsNumbers.length>0;comeWorking=false;comeNumbers=[];comeOddsNumbers=[];updateComeDisplay();if(hadWorking&&hadEstablished)return hadOdds?'sevenOutBothOdds':'sevenOutBoth';if(hadWorking)return 'comeBoxWin';if(hadEstablished)return hadOdds?'establishedLostOdds':'establishedLost';return null}
-let establishedIndex=comeNumbers.indexOf(r.total);if(establishedIndex!==-1){let hadOdds=comeOddsNumbers.includes(r.total);comeNumbers.splice(establishedIndex,1);comeOddsNumbers=comeOddsNumbers.filter(x=>x!==r.total);updateComeDisplay();return hadOdds?'establishedWinOdds':'establishedWin'}
-if(!comeWorking)return null;if([4,5,6,8,9,10].includes(r.total)){comeWorking=false;if(!comeNumbers.includes(r.total))comeNumbers.push(r.total);updateComeDisplay();return 'traveled'}
-if(r.total===7||r.total===11){comeWorking=false;updateComeDisplay();return 'comeBoxWin'}
-if([2,3,12].includes(r.total)){comeWorking=false;updateComeDisplay();return 'comeBoxLoss'}
+function applyComeState(r,state){
+// Established Come flat bets remain contract bets on the come-out. Their odds are OFF by default.
+if(state.oldPoint===null){
+  let establishedIndex=comeNumbers.indexOf(r.total);
+  if(r.total===7&&comeNumbers.length){
+    let lost=[...comeNumbers],returned=[...comeOddsNumbers];
+    comeNumbers=[];comeOddsNumbers=[];updateComeDisplay();
+    return{type:'comeoutSevenEstablished',lost,returned};
+  }
+  if(establishedIndex!==-1){
+    let n=r.total,hadOdds=comeOddsNumbers.includes(n);
+    comeNumbers.splice(establishedIndex,1);comeOddsNumbers=comeOddsNumbers.filter(x=>x!==n);updateComeDisplay();
+    return{type:'comeoutEstablishedWin',number:n,returned:hadOdds?[n]:[]};
+  }
+  return null;
+}
+if(state.event==='sevenOut'){
+  let hadWorking=comeWorking,lost=[...comeNumbers],lostOdds=[...comeOddsNumbers];
+  comeWorking=false;comeNumbers=[];comeOddsNumbers=[];updateComeDisplay();
+  return{type:'sevenOut',hadWorking,lost,lostOdds};
+}
+let establishedIndex=comeNumbers.indexOf(r.total);
+if(establishedIndex!==-1){
+  let hadOdds=comeOddsNumbers.includes(r.total),n=r.total;
+  comeNumbers.splice(establishedIndex,1);comeOddsNumbers=comeOddsNumbers.filter(x=>x!==r.total);updateComeDisplay();
+  return{type:'establishedWin',number:n,hadOdds};
+}
+if(!comeWorking)return null;
+if([4,5,6,8,9,10].includes(r.total)){
+  comeWorking=false;if(!comeNumbers.includes(r.total))comeNumbers.push(r.total);updateComeDisplay();return{type:'traveled',number:r.total};
+}
+if(r.total===7||r.total===11){comeWorking=false;updateComeDisplay();return{type:'comeBoxWin'};}
+if([2,3,12].includes(r.total)){comeWorking=false;updateComeDisplay();return{type:'comeBoxLoss'};}
 return null}
-
 function applyPointState(r){let oldPoint=point,event='roll';if(oldPoint===null){if([4,5,6,8,9,10].includes(r.total)){point=r.total;event='established'}
 else if(r.total===7||r.total===11)event='comeoutWin';else if([2,3,12].includes(r.total))event='comeoutCraps'}
 else{if(r.total===oldPoint){point=null;event='pointMade'}
 else if(r.total===7){point=null;event='sevenOut'}}
 updatePointDisplay();return{event,oldPoint}}
 
-function dealerInstructionFor(state,r){if(state.event==='established')return{call:'POINT IS '+r.total,action:'POINT '+r.total};if(state.event==='pointMade')return{call:r.total+' — WINNER!',action:state.hadPassOdds?'PAY PASS LINE + ODDS':'PAY PASS LINE'};if(state.event==='sevenOut')return{call:'SEVEN OUT',action:(state.hadPassOdds?'TAKE LINE + ODDS':'TAKE LINE')+' · PAY COME BOX'};if(state.event==='comeoutWin'&&r.total===7)return{call:'SEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutWin'&&r.total===11)return{call:'YO ELEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutCraps')return{call:r.total===12?'CRAPS TWELVE':'CRAPS '+r.total,action:'PASS LINE LOSES'};return{call:'ROLL IS '+r.total,action:'POINT REMAINS '+state.oldPoint}}
+function dealerInstructionFor(state,r){if(state.event==='established')return{call:'POINT IS '+r.total,action:'POINT '+r.total};if(state.event==='pointMade')return{call:r.total+' — WINNER!',action:state.hadPassOdds?'PAY PASS LINE + ODDS':'PAY PASS LINE'};if(state.event==='sevenOut')return{call:'SEVEN OUT',action:state.hadPassOdds?'TAKE LINE + ODDS':'TAKE LINE'};if(state.event==='comeoutWin'&&r.total===7)return{call:'SEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutWin'&&r.total===11)return{call:'YO ELEVEN — WINNER!',action:'PAY THE PASS LINE'};if(state.event==='comeoutCraps')return{call:r.total===12?'CRAPS TWELVE':'CRAPS '+r.total,action:'PASS LINE LOSES'};return{call:'ROLL IS '+r.total,action:'POINT REMAINS '+state.oldPoint}}
 
 function rollCallSpeech(r){if(r.dice&&r.dice[0]===r.dice[1]){if(r.total===2)return 'Roll is snake eyes.';if([4,6,8,10].includes(r.total))return 'Roll is hard '+r.total+'.';if(r.total===12)return 'Roll is boxcars.'}
 if(r.total===3&&r.dice)return 'Roll is ace deuce.';if(r.total===11)return 'Roll is yo eleven.';return 'Roll is '+r.total+'.'}
 
 function pointMessage(state,r){if(state.event==='established')return 'Point is '+r.total+'.';if(state.event==='pointMade')return r.total+', winner! Pay the pass line'+(state.hadPassOdds?' and odds':'')+'. Point is off. Come-out roll.';if(state.event==='sevenOut')return 'Seven out. Take the line'+(state.hadPassOdds?' and odds':'')+'.';if(state.event==='comeoutWin')return r.total===7?'Seven, winner. Pay the pass line.':'Yo eleven, winner. Pay the pass line.';if(state.event==='comeoutCraps')return 'Craps '+r.total+'. Pass line loses.';return rollCallSpeech(r)}
 
-function takeItemsForRoll(state,comeEvent,placeSnapshot){
-let items=[];
-if(state.event==='comeoutCraps')items.push('Pass Line');
+function workflowForRoll(state,comeEvent,placeSnapshot){
+let wf={take:[],pay:[],returns:[],move:[]};
+if(state.event==='comeoutCraps')wf.take.push('Pass Line');
+if(state.event==='comeoutWin')wf.pay.push('Pass Line');
+if(state.event==='pointMade')wf.pay.push(state.hadPassOdds?'Pass Line + Odds':'Pass Line');
 if(state.event==='sevenOut'){
-items.push(state.hadPassOdds?'Pass Line + Odds':'Pass Line');
-if(comeEvent==='establishedLostOdds'||comeEvent==='sevenOutBothOdds')items.push('Established Come Bets + Odds');
-else if(comeEvent==='establishedLost'||comeEvent==='sevenOutBoth')items.push('Established Come Bets');
-if(placeSnapshot.length)items.push('Place Bets');
+  wf.take.push(state.hadPassOdds?'Pass Line + Odds':'Pass Line');
+  if(comeEvent&&comeEvent.lost.length)wf.take.push('Established Come Bets: '+comeEvent.lost.join(', ')+(comeEvent.lostOdds.length?' + Odds':''));
+  if(placeSnapshot.length)wf.take.push('Place Bets: '+placeSnapshot.join(', '));
+  if(comeEvent&&comeEvent.hadWorking)wf.pay.push('Come Box Bet');
 }
-if(comeEvent==='comeBoxLoss')items.push('Come Box Bet');
-return items}
-function showTakeStep(items){
-takeList.innerHTML='';
-if(!items.length){takeStep.classList.add('hidden');nextRollBtn.classList.remove('hidden');return}
-nextRollBtn.classList.add('hidden');
-items.forEach(item=>{let row=document.createElement('div');row.className='take-item';row.textContent=item;takeList.appendChild(row)});
-takeDoneBtn.textContent='DONE — LOSING BETS TAKEN';takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete');takeStep.classList.remove('hidden')}
-function clearTakeStep(){takeList.innerHTML='';takeStep.classList.add('hidden');takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete')}
+if(comeEvent){
+  if(comeEvent.type==='comeBoxLoss')wf.take.push('Come Box Bet');
+  if(comeEvent.type==='comeBoxWin')wf.pay.push('Come Box Bet');
+  if(comeEvent.type==='establishedWin')wf.pay.push('Come '+comeEvent.number+(comeEvent.hadOdds?' + Odds':''));
+  if(comeEvent.type==='traveled')wf.move.push('Move Come Bet to '+comeEvent.number);
+  if(comeEvent.type==='comeoutSevenEstablished'){
+    wf.take.push('Established Come Flat Bets: '+comeEvent.lost.join(', '));
+    if(comeEvent.returned.length)wf.returns.push('Return Come Odds: '+comeEvent.returned.join(', '));
+  }
+  if(comeEvent.type==='comeoutEstablishedWin'){
+    wf.pay.push('Come '+comeEvent.number+' Flat Bet');
+    if(comeEvent.returned.length)wf.returns.push('Return Come '+comeEvent.number+' Odds (OFF)');
+  }
+}
+return wf}
+function renderWorkflowList(listEl,items){listEl.innerHTML='';items.forEach(item=>{let row=document.createElement('div');row.className=listEl===takeList?'take-item':'workflow-item';row.textContent=item;listEl.appendChild(row)})}
+function hideAllWorkflowSteps(){takeStep.classList.add('hidden');payStep.classList.add('hidden');returnStep.classList.add('hidden');moveStep.classList.add('hidden')}
+function resetWorkflowButtons(){takeDoneBtn.textContent='DONE — LOSING BETS TAKEN';takeDoneBtn.disabled=false;takeDoneBtn.classList.remove('complete');payDoneBtn.textContent='DONE — WINNING BETS PAID';payDoneBtn.disabled=false;payDoneBtn.classList.remove('complete');returnDoneBtn.textContent='DONE — ODDS RETURNED';returnDoneBtn.disabled=false;returnDoneBtn.classList.remove('complete');moveDoneBtn.textContent='DONE — COME BET MOVED';moveDoneBtn.disabled=false;moveDoneBtn.classList.remove('complete')}
+function showCurrentWorkflow(){
+  hideAllWorkflowSteps();nextRollBtn.classList.add('hidden');
+  let order=['take','pay','returns','move'],next=order.find(k=>rollWorkflow[k].length);
+  workflowStage=next||'';
+  if(!next){nextRollBtn.classList.remove('hidden');promoteCurrentTableState();return}
+  if(next==='take'){renderWorkflowList(takeList,rollWorkflow.take);takeStep.classList.remove('hidden')}
+  if(next==='pay'){renderWorkflowList(payList,rollWorkflow.pay);payStep.classList.remove('hidden')}
+  if(next==='returns'){renderWorkflowList(returnList,rollWorkflow.returns);returnStep.classList.remove('hidden')}
+  if(next==='move'){renderWorkflowList(moveList,rollWorkflow.move);moveStep.classList.remove('hidden')}
+}
+function completeWorkflowStage(stage){rollWorkflow[stage]=[];showCurrentWorkflow()}
+function promoteCurrentTableState(){
+  if(point===null){dealerCall.textContent='POINT OFF';dealerAction.textContent='COME-OUT';dealerInstruction.classList.add('table-state-prominent')}
+  else dealerInstruction.classList.remove('table-state-prominent');
+}
+function startWorkflow(wf){rollWorkflow=wf;resetWorkflowButtons();showCurrentWorkflow()}
+function clearTakeStep(){rollWorkflow={take:[],pay:[],returns:[],move:[]};workflowStage='';hideAllWorkflowSteps();resetWorkflowButtons();dealerInstruction.classList.remove('table-state-prominent')}
 
 function capturePreRollState(){return{point,comeWorking,comeNumbers:[...comeNumbers],comeOddsNumbers:[...comeOddsNumbers],placeNumbers:[...placeNumbers],passOddsWorking,lastDealerCall,dealerCall:dealerCall.textContent,dealerAction:dealerAction.textContent}}
 function restorePreRollState(){if(!preRollSnapshot)return;point=preRollSnapshot.point;comeWorking=preRollSnapshot.comeWorking;comeNumbers=[...preRollSnapshot.comeNumbers];comeOddsNumbers=[...preRollSnapshot.comeOddsNumbers];placeNumbers=[...preRollSnapshot.placeNumbers];passOddsWorking=preRollSnapshot.passOddsWorking;lastDealerCall=preRollSnapshot.lastDealerCall;dealerCall.textContent=preRollSnapshot.dealerCall;dealerAction.textContent=preRollSnapshot.dealerAction;repeatCallBtn.disabled=!lastDealerCall;updatePointDisplay()}
@@ -364,18 +458,26 @@ function confirmDice(pair){if(!pendingRoll)return;let total=pendingRoll.total,he
 function setVoiceRoll(r,heard,announceRoll=false){currentRoll=r.total;currentDice=r.dice;rollDisplay.textContent=r.total;diceDetail.textContent=r.label;rollHeard.textContent='Heard: “'+heard+'”';
 let hadPassOdds=passOddsWorking,placeSnapshot=[...placeNumbers],state=applyPointState(r);state.hadPassOdds=hadPassOdds;if(state.event==='pointMade'||state.event==='sevenOut')passOddsWorking=false;
 let comeEvent=applyComeState(r,state),kinds=betsForRoll(r);
-showTakeStep(takeItemsForRoll(state,comeEvent,placeSnapshot));
-// Show Odds only when active Pass Odds win on a made point OR when an established Come bet with odds wins.
-if(kinds.includes('odds') && !(state.event==='pointMade' && state.hadPassOdds) && comeEvent!=='establishedWinOdds')kinds=kinds.filter(k=>k!=='odds');
+let wf=workflowForRoll(state,comeEvent,placeSnapshot);startWorkflow(wf);
+// Show Odds only when active Pass Odds win on a made point OR when an established Come bet with odds wins while point is ON.
+let comeOddsWin=comeEvent&&comeEvent.type==='establishedWin'&&comeEvent.hadOdds;
+if(kinds.includes('odds') && !(state.event==='pointMade'&&state.hadPassOdds) && !comeOddsWin)kinds=kinds.filter(k=>k!=='odds');
 renderVoiceCards(kinds);
-let instruction=dealerInstructionFor(state,r);dealerCall.textContent=instruction.call;dealerAction.textContent=instruction.action;
-let msg=pointMessage(state,r);
-let comeNote=comeEvent==='traveled'?' Come bet moved to '+r.total+'. Add odds if needed.':comeEvent==='establishedWinOdds'?' Come '+r.total+' and odds win.':comeEvent==='establishedWin'?' Come '+r.total+' wins.':comeEvent==='establishedLostOdds'?' Established Come bets and odds lose.':comeEvent==='establishedLost'?' Established Come bets lose.':comeEvent==='sevenOutBothOdds'?' Established Come bets and odds lose.':comeEvent==='sevenOutBoth'?' Established Come bets lose.':comeEvent==='comeBoxWin'?'':comeEvent==='comeBoxLoss'?' Come-box bet loses.':'';
+let instruction=dealerInstructionFor(state,r);dealerCall.textContent=instruction.call;dealerAction.textContent=instruction.action;dealerInstruction.classList.remove('table-state-prominent');
+let msg=pointMessage(state,r),comeNote='';
+if(comeEvent){
+ if(comeEvent.type==='traveled')comeNote=' Come bet moves to '+r.total+'.';
+ else if(comeEvent.type==='establishedWin')comeNote=' Come '+r.total+(comeEvent.hadOdds?' and odds':'')+' win.';
+ else if(comeEvent.type==='comeBoxLoss')comeNote=' Come-box bet loses.';
+ else if(comeEvent.type==='comeBoxWin')comeNote=' Pay the Come box.';
+ else if(comeEvent.type==='comeoutSevenEstablished')comeNote=' Established Come flat bets lose.'+(comeEvent.returned.length?' Return their odds.':'');
+ else if(comeEvent.type==='comeoutEstablishedWin')comeNote=' Come '+r.total+' flat bet wins.'+(comeEvent.returned.length?' Return its odds; odds are off.':'');
+ else if(comeEvent.type==='sevenOut'){if(comeEvent.lost.length)comeNote=' Established Come bets'+(comeEvent.lostOdds.length?' and odds':'')+' lose.';if(comeEvent.hadWorking)comeNote+=' Pay the Come box.';}
+}
 let placeNote=state.event==='sevenOut'&&placeNumbers.length?' Take the Place bets.':'';
-let comeBoxNote=(comeEvent==='sevenOutBothOdds'||comeEvent==='sevenOutBoth'||comeEvent==='comeBoxWin')?' Pay the Come box.':'';if(state.event==='sevenOut')placeNumbers=[];
+if(state.event==='sevenOut')placeNumbers=[];
 let closing=state.event==='sevenOut'?' Point is off. New come-out roll.':'';
-let fullCall=msg+comeNote+placeNote+comeBoxNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();if(state.event==='pointMade'||state.event==='sevenOut')updatePointDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');if(announceRoll){lastDealerCall=fullCall;repeatCallBtn.disabled=!lastDealerCall;if('speechSynthesis'in window){try{speechSynthesis.cancel();let first=new SpeechSynthesisUtterance(rollCallSpeech(r).replace(/^Roll is/i,'The roll is'));first.volume=1;first.rate=1;let second=new SpeechSynthesisUtterance(fullCall);second.volume=1;second.rate=1;speechSynthesis.speak(first);speechSynthesis.speak(second)}catch(e){}}}else voiceSpeak(fullCall,true)}
-
+let fullCall=msg+comeNote+placeNote+closing;if(state.event==='sevenOut')updatePlaceDisplay();if(state.event==='pointMade'||state.event==='sevenOut')updatePointDisplay();dealerStatus.textContent=fullCall+(kinds.length?' Tap a bet microphone and say only the dollar amount.':'');if(announceRoll){lastDealerCall=fullCall;repeatCallBtn.disabled=!lastDealerCall;if('speechSynthesis'in window){try{speechSynthesis.cancel();let first=new SpeechSynthesisUtterance(rollCallSpeech(r).replace(/^Roll is/i,'The roll is'));first.volume=1;first.rate=1;let second=new SpeechSynthesisUtterance(fullCall);second.volume=1;second.rate=1;speechSynthesis.speak(first);speechSynthesis.speak(second)}catch(e){}}}else voiceSpeak(fullCall,true)}
 function setVoiceBet(kind,a){let card=payCards.querySelector('[data-kind="'+kind+'"]');if(!card||!betDefs[kind])return;
 let w=betDefs[kind].calc(a);card.querySelector('[data-bet]').textContent=fmt(a);card.querySelector('[data-pay]').textContent=fmt(w);dealerStatus.textContent=fmt(a)+' pays '+fmt(w)+'.';voiceSpeak('Payout is '+fmt(w).replace('$','')+' dollars')}
 const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -386,7 +488,10 @@ catch(e){}}
 if(VoiceRecognition){vr=new VoiceRecognition();vr.lang='en-US';vr.interimResults=false;vr.maxAlternatives=3;vr.addEventListener('result',e=>{let raw=e.results[0][0].transcript;if(voiceMode==='roll'){let r=parseRoll(raw);if(r)showDiceConfirmation(r,raw);else{rollHeard.textContent='Heard: “'+raw+'”';dealerStatus.textContent='I did not understand that roll.'}}
 else{let a=voiceAmount(raw);if(a>0)setVoiceBet(voiceMode,a);else dealerStatus.textContent='Heard “'+raw+'”. Please say only the dollar amount.'}});vr.addEventListener('end',()=>document.querySelectorAll('.mic-btn').forEach(x=>x.classList.remove('listening')));vr.addEventListener('error',e=>{dealerStatus.textContent=e.error==='not-allowed'?'Microphone permission is needed.':'I could not hear that clearly. Please try again.'})}
 else dealerStatus.textContent='Voice recognition is not available here. The manual calculator below still works.';
-takeDoneBtn.addEventListener('click',()=>{takeDoneBtn.textContent='✓ TAKE COMPLETE';takeDoneBtn.disabled=true;takeDoneBtn.classList.add('complete');nextRollBtn.classList.remove('hidden');dealerStatus.textContent='TAKE complete. Ready for the next roll.'});
+takeDoneBtn.addEventListener('click',()=>{takeDoneBtn.textContent='✓ TAKE COMPLETE';takeDoneBtn.disabled=true;takeDoneBtn.classList.add('complete');completeWorkflowStage('take');dealerStatus.textContent='TAKE complete. Continue to the next dealer action.'});
+payDoneBtn.addEventListener('click',()=>{payDoneBtn.textContent='✓ PAY COMPLETE';payDoneBtn.disabled=true;payDoneBtn.classList.add('complete');completeWorkflowStage('pay');dealerStatus.textContent='PAY complete. Continue to the next dealer action.'});
+returnDoneBtn.addEventListener('click',()=>{returnDoneBtn.textContent='✓ RETURN COMPLETE';returnDoneBtn.disabled=true;returnDoneBtn.classList.add('complete');completeWorkflowStage('returns');dealerStatus.textContent='RETURN complete. Continue to the next dealer action.'});
+moveDoneBtn.addEventListener('click',()=>{moveDoneBtn.textContent='✓ MOVE COMPLETE';moveDoneBtn.disabled=true;moveDoneBtn.classList.add('complete');completeWorkflowStage('move');dealerStatus.textContent='MOVE complete. Ready for the next roll.'});
 correctRollBtn.addEventListener('click',()=>{restorePreRollState();preRollSnapshot=null;resetRollEntry();dealerStatus.textContent='Roll corrected. Select the correct total.'});
 nextRollBtn.addEventListener('click',()=>{preRollSnapshot=null;resetRollEntry();});
 repeatCallBtn.addEventListener('click',()=>{if(!lastDealerCall)return;dealerStatus.textContent='Repeating: '+lastDealerCall;voiceSpeak(lastDealerCall)});
